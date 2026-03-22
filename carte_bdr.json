@@ -7627,12 +7627,13 @@
         "t2": null
       },
       "13049": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Christian NERVI",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -7691,12 +7692,13 @@
         "t2": null
       },
       "13052": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Éric LECOFFRE",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -7859,12 +7861,13 @@
         ]
       },
       "13057": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Laurent GESLIN",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
