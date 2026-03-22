@@ -9246,12 +9246,13 @@
         "t2": null
       },
       "13115": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Anne REYBAUD DECROIX",
-            "pct": 54.13
+            "pct": 54.13,
+            "elu": true
           },
           {
             "nuance": "LDIV",
