@@ -8401,7 +8401,7 @@
         "t2": null
       },
       "13086": {
-        "nuance": null,
+        "nuance": "LDVC",
         "t1": [
           {
             "nuance": "LDVG",
@@ -8432,7 +8432,7 @@
           {
             "nuance": "LDVC",
             "tete": "Eric BOUILLÉ",
-            "pct": 0,
+            "pct": 44.94,
             "fusions": [
               {
                 "nuance": "LDVD",
@@ -8444,12 +8444,12 @@
           {
             "nuance": "LDVG",
             "tete": "Hélène SPINELLI",
-            "pct": 0
+            "pct": 42.24
           },
           {
             "nuance": "LUDR",
             "tete": "Marie France BERTIN",
-            "pct": 0
+            "pct": 12.82
           }
         ]
       },
@@ -8796,7 +8796,7 @@
         ]
       },
       "13102": {
-        "nuance": null,
+        "nuance": "LLR",
         "t1": [
           {
             "nuance": "LLR",
@@ -8828,17 +8828,18 @@
           {
             "nuance": "LLR",
             "tete": "Claude PICCIRILLO",
-            "pct": 0
+            "pct": 53.36,
+            "elu": true
           },
           {
             "nuance": "LDVD",
             "tete": "Pierre GELSI",
-            "pct": 0
+            "pct": 32.37
           },
           {
             "nuance": "LDVD",
             "tete": "Sabine ZOULALIAN",
-            "pct": 0
+            "pct": 14.26
           },
           {
             "nuance": "LDVD",
