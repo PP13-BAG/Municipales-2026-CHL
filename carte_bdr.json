@@ -6477,7 +6477,7 @@
         "t2": null
       },
       "13004": {
-        "nuance": "LDVC",
+        "nuance": null,
         "t1": [
           {
             "nuance": "LDVC",
@@ -6514,8 +6514,7 @@
           {
             "nuance": "LDVC",
             "tete": "Patrick DE CAROLIS",
-            "pct": 23,
-            "elu": true
+            "pct": 0
           },
           {
             "nuance": "LUG",
