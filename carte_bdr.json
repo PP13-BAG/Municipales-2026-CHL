@@ -7754,7 +7754,7 @@
         ]
       },
       "13056": {
-        "nuance": null,
+        "nuance": "LDVG",
         "t1": [
           {
             "nuance": "LDVG",
@@ -7786,17 +7786,18 @@
           {
             "nuance": "LDVG",
             "tete": "Gaby CHARROUX",
-            "pct": 0
+            "pct": 44.14,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Emmanuel FOUQUART",
-            "pct": 0
+            "pct": 35.05
           },
           {
             "nuance": "LDVD",
             "tete": "Jean Luc DI MARIA",
-            "pct": 0
+            "pct": 20.81
           }
         ]
       },
