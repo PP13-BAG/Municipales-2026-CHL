@@ -9095,7 +9095,7 @@
         ]
       },
       "13109": {
-        "nuance": null,
+        "nuance": "LDIV",
         "t1": [
           {
             "nuance": "LDIV",
@@ -9122,22 +9122,23 @@
           {
             "nuance": "LDIV",
             "tete": "Serge MORI",
-            "pct": 0
+            "pct": 31.68,
+            "elu": true
           },
           {
             "nuance": "LDIV",
             "tete": "Alexandre RAOUX",
-            "pct": 0
+            "pct": 30.95
           },
           {
             "nuance": "LDIV",
             "tete": "Vincent LANGUILLE",
-            "pct": 0
+            "pct": 26.36
           },
           {
             "nuance": "LDIV",
             "tete": "Stéphane FAURE",
-            "pct": 0
+            "pct": 11.31
           }
         ]
       },
