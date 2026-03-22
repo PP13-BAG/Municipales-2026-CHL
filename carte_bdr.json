@@ -3013,7 +3013,8 @@
           {
             "nuance": "LUDI",
             "tete": "Philippe CHARRIN",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -6981,12 +6982,13 @@
         "t2": null
       },
       "13025": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Michel BOULAN",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -9158,12 +9160,13 @@
         "t2": null
       },
       "13111": {
-        "nuance": "LDIV",
+        "nuance": "LUDI",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LUDI",
             "tete": "Philippe CHARRIN",
-            "pct": 60.24
+            "pct": 60.24,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -10373,7 +10376,6 @@
   },
   "settings": {
     "visibleYears": [
-      2020,
       2026
     ],
     "viewMode": "dept",
