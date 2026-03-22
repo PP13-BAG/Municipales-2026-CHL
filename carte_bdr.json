@@ -6874,12 +6874,13 @@
         "t2": null
       },
       "13020": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Serge PEROTTINO",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
