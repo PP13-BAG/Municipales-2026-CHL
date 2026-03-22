@@ -7256,7 +7256,7 @@
         "t2": null
       },
       "13035": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -7278,17 +7278,18 @@
           {
             "nuance": "LDVD",
             "tete": "Frédéric DURAND",
-            "pct": 0
+            "pct": 43.57,
+            "elu": true
           },
           {
             "nuance": "LDVC",
             "tete": "Audrey TOURON",
-            "pct": 0
+            "pct": 31.76
           },
           {
             "nuance": "LDVD",
             "tete": "Henri PONS",
-            "pct": 0
+            "pct": 24.67
           }
         ]
       },
@@ -8029,7 +8030,7 @@
         "t2": null
       },
       "13066": {
-        "nuance": null,
+        "nuance": "LDVG",
         "t1": [
           {
             "nuance": "LDVG",
@@ -8056,22 +8057,23 @@
           {
             "nuance": "LDVG",
             "tete": "Laurent FABRE",
-            "pct": 0
+            "pct": 37.08,
+            "elu": true
           },
           {
             "nuance": "LDIV",
             "tete": "Christian REY",
-            "pct": 0
+            "pct": 32.73
           },
           {
             "nuance": "LRN",
             "tete": "Audrey CHIKHAOUI",
-            "pct": 0
+            "pct": 22.08
           },
           {
             "nuance": "LDVC",
             "tete": "Yvan GINOUX",
-            "pct": 0
+            "pct": 8.11
           }
         ]
       },
