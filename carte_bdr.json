@@ -6533,80 +6533,7 @@
           }
         ]
       },
-      "13005": {
-        "nuance": null,
-        "t1": [
-          {
-            "nuance": "LRN",
-            "tete": "Joëlle MELIN",
-            "pct": 24.94
-          },
-          {
-            "nuance": "LDVD",
-            "tete": "Gérard GAZAY",
-            "pct": 24.83
-          },
-          {
-            "nuance": "LUG",
-            "tete": "Jean-Pierre SQUILLARI",
-            "pct": 23.34
-          },
-          {
-            "nuance": "LDVC",
-            "tete": "Giovanni SCHIPANI",
-            "pct": 16.06,
-            "fusedInto": {
-              "nuance": "LUG",
-              "tete": "Jean-Pierre SQUILLARI"
-            }
-          },
-          {
-            "nuance": "LDVC",
-            "tete": "Mohammed SALEM",
-            "pct": 6.56,
-            "fusedInto": {
-              "nuance": "LDVD",
-              "tete": "Gérard GAZAY"
-            }
-          },
-          {
-            "nuance": "LFI",
-            "tete": "Elodie MALEK",
-            "pct": 4.27
-          }
-        ],
-        "t2": [
-          {
-            "nuance": "LRN",
-            "tete": "Joëlle MELIN",
-            "pct": 0
-          },
-          {
-            "nuance": "LDVD",
-            "tete": "Gérard GAZAY",
-            "pct": 0,
-            "fusions": [
-              {
-                "nuance": "LDVC",
-                "tete": "Mohammed SALEM",
-                "pct": 6.56
-              }
-            ]
-          },
-          {
-            "nuance": "LUG",
-            "tete": "Jean-Pierre SQUILLARI",
-            "pct": 0,
-            "fusions": [
-              {
-                "nuance": "LDVC",
-                "tete": "Giovanni SCHIPANI",
-                "pct": 16.06
-              }
-            ]
-          }
-        ]
-      },
+      "13005": "LUG",
       "13006": {
         "nuance": "LDVG",
         "t1": [
@@ -8948,39 +8875,40 @@
         "t2": null
       },
       "13104": {
-        "nuance": null,
+        "nuance": "LDVC",
         "t1": [
           {
             "nuance": "LDVC",
             "tete": "Maxime MARCHAND",
-            "pct": 46.03
+            "pct": 0
           },
           {
             "nuance": "LDVD",
             "tete": "Eric DIARD",
-            "pct": 33.15
+            "pct": 0
           },
           {
             "nuance": "LRN",
             "tete": "Jean-Charles VARGAS",
-            "pct": 20.83
+            "pct": 0
           }
         ],
         "t2": [
           {
             "nuance": "LDVC",
             "tete": "Maxime MARCHAND",
-            "pct": 0
+            "pct": 49.68,
+            "elu": true
           },
           {
             "nuance": "LDVD",
             "tete": "Eric DIARD",
-            "pct": 0
+            "pct": 37.1
           },
           {
             "nuance": "LRN",
             "tete": "Jean-Charles VARGAS",
-            "pct": 0
+            "pct": 13.22
           }
         ]
       },
