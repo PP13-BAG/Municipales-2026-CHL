@@ -6923,7 +6923,7 @@
         "t2": null
       },
       "13026": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -6945,17 +6945,18 @@
           {
             "nuance": "LDVD",
             "tete": "Roland MOUREN",
-            "pct": 0
+            "pct": 46.84,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Alain VACCALLUZZO",
-            "pct": 0
+            "pct": 46.26
           },
           {
             "nuance": "LUG",
             "tete": "Laurence JOUANAUD",
-            "pct": 0
+            "pct": 6.9
           }
         ]
       },
@@ -8707,7 +8708,7 @@
         "t2": null
       },
       "13100": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVC",
@@ -8727,19 +8728,20 @@
         ],
         "t2": [
           {
-            "nuance": "LDVC",
-            "tete": "Hervé CHERUBINI",
-            "pct": 0
-          },
-          {
             "nuance": "LDVD",
             "tete": "Romain THOMAS",
-            "pct": 0
+            "pct": 47.41,
+            "elu": true
+          },
+          {
+            "nuance": "LDVC",
+            "tete": "Hervé CHERUBINI",
+            "pct": 45.42
           },
           {
             "nuance": "LRN",
             "tete": "Yohan THIEBAUD",
-            "pct": 0
+            "pct": 7.17
           }
         ]
       },
@@ -8922,7 +8924,7 @@
         ]
       },
       "13105": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -8944,17 +8946,18 @@
           {
             "nuance": "LDVD",
             "tete": "Philippe GINOUX",
-            "pct": 0
+            "pct": 49.49,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Romain BAUBRY",
-            "pct": 0
+            "pct": 42.4
           },
           {
             "nuance": "LDVC",
             "tete": "Terry CHABERT",
-            "pct": 0
+            "pct": 8.11
           }
         ]
       },
