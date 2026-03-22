@@ -7645,7 +7645,7 @@
         "t2": null
       },
       "13050": {
-        "nuance": null,
+        "nuance": "LDVC",
         "t1": [
           {
             "nuance": "LDVC",
@@ -7667,17 +7667,18 @@
           {
             "nuance": "LDVC",
             "tete": "Philippe RAZEYRE",
-            "pct": 0
+            "pct": 42.11,
+            "elu": true
           },
           {
             "nuance": "LDVD",
             "tete": "Claire BLANC",
-            "pct": 0
+            "pct": 31.97
           },
           {
             "nuance": "LDVG",
             "tete": "François BERGA",
-            "pct": 0
+            "pct": 25.93
           }
         ]
       },
