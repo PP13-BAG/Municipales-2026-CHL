@@ -7820,7 +7820,7 @@
         ]
       },
       "13056": {
-        "nuance": null,
+        "nuance": "LDVG",
         "t1": [
           {
             "nuance": "LDVG",
@@ -7852,7 +7852,8 @@
           {
             "nuance": "LDVG",
             "tete": "Gaby CHARROUX",
-            "pct": 0
+            "pct": 0,
+            "elu": true
           },
           {
             "nuance": "LRN",
