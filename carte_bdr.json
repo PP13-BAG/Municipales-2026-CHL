@@ -7873,12 +7873,13 @@
         "t2": null
       },
       "13058": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Jean-Christophe CARRÉ",
-            "pct": 53.59
+            "pct": 53.59,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -7995,12 +7996,13 @@
         "t2": null
       },
       "13064": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Corinne CHABAUD",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -8085,12 +8087,13 @@
         "t2": null
       },
       "13068": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Pascale LICARI",
-            "pct": 64.24
+            "pct": 64.24,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -8618,12 +8621,13 @@
         "t2": null
       },
       "13094": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Jean MANGION",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
