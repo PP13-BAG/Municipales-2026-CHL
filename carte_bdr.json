@@ -3508,12 +3508,13 @@
         ]
       },
       "13006": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Lionel ESCOFFIER",
-            "pct": 68.55
+            "pct": 68.55,
+            "elu": true
           }
         ],
         "t2": null
@@ -3744,12 +3745,13 @@
         ]
       },
       "13020": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Serge PEROTTINO",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -3829,12 +3831,13 @@
         "t2": null
       },
       "13024": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Yves WIGT",
-            "pct": 63.31
+            "pct": 63.31,
+            "elu": true
           }
         ],
         "t2": null
@@ -4040,12 +4043,13 @@
         "t2": null
       },
       "13034": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Aline PELISSIER",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -4352,10 +4356,10 @@
         "t2": null
       },
       "13048": {
-        "nuance": "LDIV",
+        "nuance": "LDVC",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVC",
             "tete": "Eric GARCIN",
             "pct": 48.57
           },
@@ -4372,9 +4376,10 @@
         ],
         "t2": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVC",
             "tete": "Eric GARCIN",
-            "pct": 59.45
+            "pct": 59.45,
+            "elu": true
           },
           {
             "nuance": "LDVC",
@@ -4389,7 +4394,7 @@
         ]
       },
       "13049": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
             "nuance": "LDVG",
@@ -4399,9 +4404,10 @@
         ],
         "t2": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Christian NERVI",
-            "pct": 53.55
+            "pct": 53.55,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -4565,23 +4571,25 @@
         "t2": null
       },
       "13058": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Jean-Christophe CARRÉ",
-            "pct": 62.97
+            "pct": 62.97,
+            "elu": true
           }
         ],
         "t2": null
       },
       "13059": {
-        "nuance": "LDIV",
+        "nuance": "LDVC",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVC",
             "tete": "Fabrice POUSSARDIN",
-            "pct": 56.37
+            "pct": 56.37,
+            "elu": true
           },
           {
             "nuance": "LDVD",
@@ -4619,12 +4627,13 @@
         "t2": null
       },
       "13062": {
-        "nuance": "LDIV",
+        "nuance": "LDVC",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVC",
             "tete": "Georges CRISTIANI",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -4656,23 +4665,25 @@
         "t2": null
       },
       "13064": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Corinne CHABAUD",
-            "pct": 63.47
+            "pct": 63.47,
+            "elu": true
           }
         ],
         "t2": null
       },
       "13065": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Alice ROGGIERO",
-            "pct": 65.18
+            "pct": 65.18,
+            "elu": true
           }
         ],
         "t2": null
@@ -4716,12 +4727,13 @@
         ]
       },
       "13068": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Pascale LICARI",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -4827,12 +4839,13 @@
         ]
       },
       "13072": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Christian BURLE",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -4928,12 +4941,13 @@
         ]
       },
       "13076": {
-        "nuance": "LDIV",
+        "nuance": "LDVD",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Jean-Louis LEPIAN",
-            "pct": 75.72
+            "pct": 75.72,
+            "elu": true
           }
         ],
         "t2": null
@@ -5253,12 +5267,13 @@
         "t2": null
       },
       "13094": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Jean MANGION",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -5769,12 +5784,13 @@
         "t2": null
       },
       "13115": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Anne REYBAUD-DECROIX",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
@@ -10368,6 +10384,7 @@
   },
   "settings": {
     "visibleYears": [
+      2020,
       2026
     ],
     "viewMode": "dept",
