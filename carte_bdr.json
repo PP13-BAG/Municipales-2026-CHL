@@ -6477,7 +6477,7 @@
         "t2": null
       },
       "13004": {
-        "nuance": null,
+        "nuance": "LDVC",
         "t1": [
           {
             "nuance": "LDVC",
@@ -6514,7 +6514,8 @@
           {
             "nuance": "LDVC",
             "tete": "Patrick DE CAROLIS",
-            "pct": 0
+            "pct": 0,
+            "elu": true
           },
           {
             "nuance": "LUG",
@@ -8685,7 +8686,7 @@
         ]
       },
       "13096": {
-        "nuance": null,
+        "nuance": "LLR",
         "t1": [
           {
             "nuance": "LLR",
@@ -8712,7 +8713,8 @@
           {
             "nuance": "LLR",
             "tete": "Didier HONORE",
-            "pct": 0
+            "pct": 0,
+            "elu": true
           },
           {
             "nuance": "LDIV",
