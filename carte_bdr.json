@@ -10281,7 +10281,7 @@
     },
     "LDVG": {
       "label": "Divers gauche",
-      "color": "#f06292",
+      "color": "#a01060",
       "g": "g"
     },
     "LECO": {
@@ -10331,7 +10331,7 @@
     },
     "LLR": {
       "label": "Les Républicains",
-      "color": "#1565c0",
+      "color": "#0d3a8e",
       "g": "dr"
     },
     "LUD": {
@@ -10356,17 +10356,17 @@
     },
     "LRN": {
       "label": "Rassemblement National",
-      "color": "#1a1a7e",
+      "color": "#804000",
       "g": "exd"
     },
     "LREC": {
       "label": "Reconquête",
-      "color": "#4a0808",
+      "color": "#804000",
       "g": "exd"
     },
     "LUXD": {
       "label": "Union de l'extrême droite",
-      "color": "#2e0a0a",
+      "color": "#804000",
       "g": "exd"
     },
     "LEXD": {
