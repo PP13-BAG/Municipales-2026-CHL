@@ -4392,7 +4392,7 @@
         "nuance": "LDIV",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Christian NERVI",
             "pct": 45.66
           }
@@ -10377,6 +10377,7 @@
   },
   "settings": {
     "visibleYears": [
+      2020,
       2026
     ],
     "viewMode": "dept",
