@@ -6813,7 +6813,7 @@
         "t2": null
       },
       "13021": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -6844,12 +6844,13 @@
           {
             "nuance": "LDVD",
             "tete": "René-Francis CARPENTIER",
-            "pct": 0
+            "pct": 56.95,
+            "elu": true
           },
           {
             "nuance": "LDVD",
             "tete": "Valérie GUARINO",
-            "pct": 0,
+            "pct": 43.05,
             "fusions": [
               {
                 "nuance": "LDVD",
@@ -7107,7 +7108,7 @@
         "t2": null
       },
       "13032": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -7133,12 +7134,13 @@
           {
             "nuance": "LDVD",
             "tete": "Renaud DAGORNE",
-            "pct": 0
+            "pct": 53.09,
+            "elu": true
           },
           {
             "nuance": "LDVC",
             "tete": "Romain CLERC",
-            "pct": 0,
+            "pct": 46.91,
             "fusions": [
               {
                 "nuance": "LDVC",
@@ -7321,7 +7323,7 @@
         "t2": null
       },
       "13039": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -7352,17 +7354,18 @@
           {
             "nuance": "LDVD",
             "tete": "Philippe MAURIZOT",
-            "pct": 0
+            "pct": 48.24,
+            "elu": true
           },
           {
             "nuance": "LDVG",
             "tete": "Rémi ESNAULT",
-            "pct": 0
+            "pct": 29.32
           },
           {
             "nuance": "LDVG",
             "tete": "Jean-Michel LEROY",
-            "pct": 0,
+            "pct": 22.44,
             "fusions": [
               {
                 "nuance": "LDVC",
@@ -7507,7 +7510,7 @@
         "t2": null
       },
       "13047": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -7534,17 +7537,18 @@
           {
             "nuance": "LDVD",
             "tete": "Robin PRÉTOT",
-            "pct": 0
+            "pct": 59.84,
+            "elu": true
           },
           {
             "nuance": "LDVG",
             "tete": "François BERNARDINI",
-            "pct": 0
+            "pct": 31.4
           },
           {
             "nuance": "LRN",
             "tete": "Damien BROC",
-            "pct": 0
+            "pct": 8.76
           }
         ]
       },
@@ -8568,7 +8572,7 @@
         "t2": null
       },
       "13095": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDIV",
@@ -8598,19 +8602,19 @@
         ],
         "t2": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVD",
             "tete": "Patrick MARKARIAN",
-            "pct": 0
+            "pct": 42.32
           },
           {
             "nuance": "LDIV",
             "tete": "François GENEVEY",
-            "pct": 0
+            "pct": 38.64
           },
           {
             "nuance": "LDIV",
             "tete": "Agnès PEYRONNET",
-            "pct": 0
+            "pct": 19.05
           }
         ]
       },
@@ -10190,7 +10194,7 @@
     "LFI": {
       "label": "La France Insoumise",
       "color": "#b5002b",
-      "g": "g"
+      "g": "exg"
     },
     "LCOM": {
       "label": "Parti Communiste Français",
@@ -10234,32 +10238,32 @@
     },
     "LREN": {
       "label": "Renaissance",
-      "color": "#f57c00",
+      "color": "#ffff00",
       "g": "c"
     },
     "LMDM": {
       "label": "MoDem",
-      "color": "#f57c00",
+      "color": "#ffff00",
       "g": "c"
     },
     "LHOR": {
       "label": "Horizons",
-      "color": "#ef8c00",
+      "color": "#ffff00",
       "g": "c"
     },
     "LUDI": {
       "label": "UDI",
-      "color": "#f57c00",
+      "color": "#ffff00",
       "g": "c"
     },
     "LUC": {
       "label": "Union du centre",
-      "color": "#f57c00",
+      "color": "#ffff00",
       "g": "c"
     },
     "LDVC": {
       "label": "Divers centre",
-      "color": "#f57c00",
+      "color": "#ffff00",
       "g": "c"
     },
     "LLR": {
@@ -10285,26 +10289,26 @@
     "LUDR": {
       "label": "Union des droites pour la République",
       "color": "#08194a",
-      "g": "dr"
+      "g": "exd"
     },
     "LRN": {
       "label": "Rassemblement National",
-      "color": "#804000",
+      "color": "#000040",
       "g": "exd"
     },
     "LREC": {
       "label": "Reconquête",
-      "color": "#804000",
+      "color": "#000040",
       "g": "exd"
     },
     "LUXD": {
       "label": "Union de l'extrême droite",
-      "color": "#804000",
+      "color": "#000040",
       "g": "exd"
     },
     "LEXD": {
       "label": "Extrême droite",
-      "color": "#804000",
+      "color": "#000040",
       "g": "exd"
     }
   },
