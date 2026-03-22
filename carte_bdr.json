@@ -6966,7 +6966,8 @@
           {
             "nuance": "LDIV",
             "tete": "Christophe HOCMARD",
-            "pct": 52.19
+            "pct": 52.19,
+            "elu": true
           },
           {
             "nuance": "LDIV",
