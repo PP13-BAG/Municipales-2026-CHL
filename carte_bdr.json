@@ -8683,7 +8683,7 @@
         "nuance": null,
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Didier HONORE",
             "pct": 34.77
           },
@@ -8705,7 +8705,7 @@
         ],
         "t2": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Didier HONORE",
             "pct": 0
           },
@@ -10371,6 +10371,7 @@
   },
   "settings": {
     "visibleYears": [
+      2020,
       2026
     ],
     "viewMode": "dept",
