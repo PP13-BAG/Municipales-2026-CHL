@@ -9833,7 +9833,7 @@
     },
     "2026": {
       "S1": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LUG",
@@ -9865,27 +9865,28 @@
           {
             "nuance": "LUG",
             "tete": "Sophie CAMARD",
-            "pct": 0
+            "pct": 44.48,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Clémence PARODI",
-            "pct": 0
+            "pct": 28.97
           },
           {
             "nuance": "LFI",
             "tete": "Sébastien BARLES",
-            "pct": 0
+            "pct": 14.86
           },
           {
             "nuance": "LDVD",
             "tete": "Romain SIMMARANO",
-            "pct": 0
+            "pct": 11.69
           }
         ]
       },
       "S2": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LUG",
@@ -9932,22 +9933,23 @@
           {
             "nuance": "LUG",
             "tete": "Anthony KREHMEIER",
-            "pct": 0
+            "pct": 48.84,
+            "elu": true
           },
           {
             "nuance": "LFI",
             "tete": "Alladine ABDALLAH SALIM",
-            "pct": 0
+            "pct": 29.48
           },
           {
             "nuance": "LRN",
             "tete": "Marie BERMEJO",
-            "pct": 0
+            "pct": 21.68
           }
         ]
       },
       "S3": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LUG",
@@ -9979,27 +9981,28 @@
           {
             "nuance": "LUG",
             "tete": "Didier JAU",
-            "pct": 0
+            "pct": 43.31,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Thomas BATTESTI",
-            "pct": 0
-          },
-          {
-            "nuance": "LDVD",
-            "tete": "Bruno GILLES",
-            "pct": 0
+            "pct": 24.63
           },
           {
             "nuance": "LFI",
             "tete": "Léa BIJAOUI",
-            "pct": 0
+            "pct": 19.93
+          },
+          {
+            "nuance": "LDVD",
+            "tete": "Bruno GILLES",
+            "pct": 12.14
           }
         ]
       },
       "S4": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LUG",
@@ -10036,22 +10039,22 @@
           {
             "nuance": "LUG",
             "tete": "Olivia FORTIN",
-            "pct": 0
+            "pct": 47.57
           },
           {
             "nuance": "LUDR",
             "tete": "Jean-Baptiste RIVOALLAN",
-            "pct": 0
+            "pct": 41.07
           },
           {
             "nuance": "LDVD",
             "tete": "Catherine PILA",
-            "pct": 0
+            "pct": 11.36
           }
         ]
       },
       "S5": {
-        "nuance": null,
+        "nuance": "LRN",
         "t1": [
           {
             "nuance": "LRN",
@@ -10083,22 +10086,23 @@
           {
             "nuance": "LRN",
             "tete": "Eléonore BEZ",
-            "pct": 0
+            "pct": 51.33,
+            "elu": true
           },
           {
             "nuance": "LUG",
             "tete": "Pierre HUGUET",
-            "pct": 0
+            "pct": 40.04
           },
           {
             "nuance": "LDVD",
             "tete": "Laure-Agnès CARADEC",
-            "pct": 0
+            "pct": 8.62
           }
         ]
       },
       "S6": {
-        "nuance": null,
+        "nuance": "LRN",
         "t1": [
           {
             "nuance": "LRN",
@@ -10125,22 +10129,22 @@
           {
             "nuance": "LRN",
             "tete": "Olivier RIOULT",
-            "pct": 0
+            "pct": 48.72
           },
           {
             "nuance": "LUG",
             "tete": "Yannick OHANESSIAN",
-            "pct": 0
+            "pct": 38.86
           },
           {
             "nuance": "LDVD",
             "tete": "Sylvain SOUVESTRE",
-            "pct": 0
+            "pct": 12.42
           }
         ]
       },
       "S7": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LRN",
@@ -10180,29 +10184,31 @@
         ],
         "t2": [
           {
-            "nuance": "LRN",
-            "tete": "Sandrine D'ANGIO",
-            "pct": 0
-          },
-          {
             "nuance": "LUG",
             "tete": "Tina BIARD SANSONETTI",
-            "pct": 0
+            "pct": 52.21,
+            "elu": true
           },
           {
-            "nuance": "LFI",
-            "tete": "Mohamed BENSAADA",
-            "pct": 0
+            "nuance": "LRN",
+            "tete": "Sandrine D'ANGIO",
+            "pct": 41.34
           },
           {
             "nuance": "LDVD",
             "tete": "Marion BAREILLE",
-            "pct": 0
+            "pct": 6.44
+          },
+          {
+            "nuance": "LFI",
+            "tete": "Mohamed BENSAADA",
+            "pct": 0,
+            "desist": true
           }
         ]
       },
       "S8": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LUG",
@@ -10239,17 +10245,18 @@
           {
             "nuance": "LUG",
             "tete": "Samia GHALI",
-            "pct": 0
+            "pct": 46.19,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Thibaut CHARPENTIER",
-            "pct": 0
+            "pct": 31.8
           },
           {
             "nuance": "LFI",
             "tete": "Rabyata BOINAHERI",
-            "pct": 0
+            "pct": 22.02
           }
         ]
       }
@@ -10387,7 +10394,7 @@
       2020,
       2026
     ],
-    "viewMode": "dept",
+    "viewMode": "marseille",
     "isDark": true
   }
 }
