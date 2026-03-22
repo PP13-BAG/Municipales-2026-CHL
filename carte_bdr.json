@@ -10251,7 +10251,7 @@
   "nuances": {
     "LEXG": {
       "label": "Extrême gauche",
-      "color": "#6b0000",
+      "color": "#b5002b",
       "g": "exg"
     },
     "LFI": {
@@ -10266,7 +10266,7 @@
     },
     "LSOC": {
       "label": "Parti Socialiste",
-      "color": "#e91e8c",
+      "color": "#a01060",
       "g": "g"
     },
     "LVEC": {
@@ -10301,7 +10301,7 @@
     },
     "LREN": {
       "label": "Renaissance",
-      "color": "#d4a000",
+      "color": "#f57c00",
       "g": "c"
     },
     "LMDM": {
@@ -10316,17 +10316,17 @@
     },
     "LUDI": {
       "label": "UDI",
-      "color": "#800080",
+      "color": "#f57c00",
       "g": "c"
     },
     "LUC": {
       "label": "Union du centre",
-      "color": "#ffff00",
+      "color": "#f57c00",
       "g": "c"
     },
     "LDVC": {
       "label": "Divers centre",
-      "color": "#ffff80",
+      "color": "#f57c00",
       "g": "c"
     },
     "LLR": {
@@ -10341,7 +10341,7 @@
     },
     "LDVD": {
       "label": "Divers droite",
-      "color": "#5e8fcc",
+      "color": "#0d3a8e",
       "g": "dr"
     },
     "LDSV": {
