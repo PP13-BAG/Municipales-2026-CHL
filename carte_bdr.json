@@ -7393,7 +7393,7 @@
         "t2": null
       },
       "13041": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -7415,17 +7415,18 @@
           {
             "nuance": "LDVD",
             "tete": "Hervé GRANIER",
-            "pct": 0
+            "pct": 50.45,
+            "elu": true
           },
           {
             "nuance": "LDVG",
             "tete": "Jean Marc LA PIANA",
-            "pct": 0
+            "pct": 37.48
           },
           {
             "nuance": "LRN",
             "tete": "Bruno PRIOURET",
-            "pct": 0
+            "pct": 12.08
           }
         ]
       },
@@ -8741,7 +8742,7 @@
         ]
       },
       "13101": {
-        "nuance": null,
+        "nuance": "LDIV",
         "t1": [
           {
             "nuance": "LDIV",
@@ -8773,17 +8774,18 @@
           {
             "nuance": "LDIV",
             "tete": "Lionel LENEL",
-            "pct": 0
+            "pct": 44.35,
+            "elu": true
           },
           {
             "nuance": "LDIV",
             "tete": "Eric CALDERON",
-            "pct": 0
+            "pct": 33.81
           },
           {
             "nuance": "LDIV",
             "tete": "Jeannette RIOU",
-            "pct": 0
+            "pct": 21.85
           },
           {
             "nuance": "LDIV",
@@ -8997,7 +8999,7 @@
         "t2": null
       },
       "13108": {
-        "nuance": null,
+        "nuance": "LRN",
         "t1": [
           {
             "nuance": "LRN",
@@ -9019,12 +9021,13 @@
           {
             "nuance": "LRN",
             "tete": "Alexandre DUCOURET",
-            "pct": 0
+            "pct": 51.91,
+            "elu": true
           },
           {
             "nuance": "LDVD",
             "tete": "Fabien BOUILLARD",
-            "pct": 0
+            "pct": 48.09
           }
         ]
       },
