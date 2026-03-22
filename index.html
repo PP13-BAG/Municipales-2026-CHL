@@ -1,0 +1,3067 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte Électorale — Bouches-du-Rhône</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+[data-theme="dark"] {
+  --bg:#1a2535; --panel:#1e2d40; --card:#243350; --border:#2a4060; --border2:#335070;
+  --text:#dce8f5; --muted:#6a8fad; --accent:#3b82f6; --a2:#60a5fa; --gold:#f59e0b;
+  --mempty:#1a3248; --scr:#254263; --sh:rgba(0,0,0,.55); --ok:#22c55e; --err:#f87171;
+}
+[data-theme="light"] {
+  --bg:#edf2f7; --panel:#fff; --card:#dde8f5; --border:#c5d6e8; --border2:#a8c0d8;
+  --text:#1a2d42; --muted:#5a7a9a; --accent:#1a6fd4; --a2:#2a7fe4; --gold:#d97706;
+  --mempty:#c5d5e5; --scr:#b0c8e0; --sh:rgba(0,0,0,.18); --ok:#15803d; --err:#dc2626;
+}
+html, body { height:100%; font-family:'IBM Plex Sans',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; font-size:13px; }
+#loading { position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:16px; }
+#loading h1 { font-family:'Playfair Display',serif; font-size:19px; color:var(--text); text-align:center; padding:0 20px; }
+#loading p  { font-size:11px; color:var(--muted); font-family:'IBM Plex Mono',monospace; line-height:1.5; text-align:center; max-width:760px; }
+.spin { width:32px; height:32px; border:3px solid var(--border2); border-top-color:var(--accent); border-radius:50%; animation:spin .75s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+#topbar {
+  height:50px; background:var(--panel); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 10px; gap:7px; z-index:600; flex-shrink:0; overflow-x:auto;
+}
+#topbar::-webkit-scrollbar { height:0; }
+#topbar-title { font-family:'Playfair Display',serif; font-size:13px; white-space:nowrap; flex-shrink:0; }
+#topbar-title em { font-style:normal; color:var(--a2); }
+.tb-sep { flex:1; min-width:4px; }
+.tbtn {
+  padding:4px 9px; font-size:10px; font-weight:500; cursor:pointer; border:1px solid var(--border);
+  background:var(--bg); color:var(--muted); border-radius:5px; transition:all .18s; text-transform:uppercase;
+  letter-spacing:.05em; white-space:nowrap; flex-shrink:0;
+}
+.tbtn:hover { border-color:var(--a2); color:var(--a2); }
+.tbtn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.tbtn.msmode { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+.tbtn.yr-on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.tbtn.yr-on:hover { background:var(--a2); }
+.combo-wrap{display:flex;gap:4px;flex-shrink:0;align-items:center}
+/* year-pop removed */
+#theme-btn {
+  display:flex; align-items:center; gap:4px; cursor:pointer; border:1px solid var(--border); padding:4px 9px; border-radius:5px;
+  background:var(--bg); font-size:10px; color:var(--muted); flex-shrink:0; transition:all .18s; white-space:nowrap;
+}
+#theme-btn:hover { border-color:var(--a2); color:var(--a2); }
+
+#app { display:flex; height:calc(100vh - 50px); position:relative; overflow:hidden; }
+#sidebar {
+  width:320px; min-width:320px; background:var(--panel); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden; transition:width .22s ease, min-width .22s ease; flex-shrink:0;
+}
+#sb-inner { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+#sb-inner::-webkit-scrollbar { width:3px; }
+#sb-inner::-webkit-scrollbar-thumb { background:var(--scr); border-radius:2px; }
+#sb-tab {
+  position:absolute; top:50%; transform:translateY(-50%); left:320px; z-index:700; background:var(--panel);
+  border:1px solid var(--border); border-left:none; border-radius:0 5px 5px 0; width:14px; height:42px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:9px; color:var(--muted); user-select:none;
+  transition:left .22s ease;
+}
+#sb-tab:hover { color:var(--a2); }
+
+.sec { border-bottom:1px solid var(--border); padding:9px 11px; flex-shrink:0; }
+.sec.grow { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:180px; }
+.sh { font-size:8px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:7px; }
+.sh em { font-style:normal; color:var(--a2); }
+
+#palette { display:flex; flex-wrap:wrap; gap:3px; }
+.chip {
+  display:flex; align-items:center; gap:3px; padding:2px 5px 3px; border-radius:4px; cursor:pointer; border:2px solid transparent;
+  background:var(--bg); font-size:8.5px; font-weight:700; color:var(--text); font-family:'IBM Plex Mono',monospace;
+  white-space:nowrap; transition:border-color .14s;
+}
+.chip:hover { border-color:rgba(96,165,250,.4); }
+.chip.on { border-color:var(--text); }
+.ndot { width:7px; height:7px; border-radius:2px; flex-shrink:0; }
+#hint, .mini-note { margin-top:6px; font-size:9px; color:var(--muted); font-style:italic; line-height:1.5; }
+
+.opt-line { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:4px 0; }
+.opt-line label { font-size:10.5px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.opt-line input[type="checkbox"] { accent-color: var(--accent); }
+
+#csv-ta, .exp-ta {
+  width:100%; font-family:'IBM Plex Mono',monospace; font-size:9.5px; background:var(--bg);
+  border:1px solid var(--border); color:var(--text); padding:5px 7px; border-radius:4px; outline:none;
+}
+#csv-ta { resize:vertical; height:95px; }
+#csv-ta:focus, .exp-ta:focus { border-color:var(--accent); }
+.crow { display:flex; gap:4px; margin-top:5px; flex-wrap:wrap; }
+.sel-sm {
+  flex:1; min-width:70px; font-size:10.5px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+  padding:3px 5px; border-radius:4px;
+}
+.bp, .bs {
+  padding:3px 8px; font-size:10.5px; border-radius:4px; cursor:pointer; white-space:nowrap;
+}
+.bp { font-weight:500; background:var(--accent); color:#fff; border:none; }
+.bp:hover { background:var(--a2); }
+.bs { background:transparent; color:var(--muted); border:1px solid var(--border); transition:all .15s; }
+.bs:hover { color:var(--text); border-color:var(--muted); }
+.fb { font-size:9px; padding:3px 7px; border-radius:4px; margin-top:4px; display:none; line-height:1.4; }
+.fb.ok { background:rgba(34,197,94,.12); color:var(--ok); display:block; }
+.fb.er { background:rgba(239,68,68,.12); color:var(--err); display:block; }
+
+#stats-wrap { display:flex; flex-direction:column; gap:3px; }
+.st-row { display:grid; grid-template-columns:48px 1fr 22px; align-items:center; gap:4px; }
+.st-lbl { font-size:8.5px; font-family:'IBM Plex Mono',monospace; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.st-bg { height:4px; background:var(--bg); border-radius:2px; overflow:hidden; }
+.st-fg { height:100%; border-radius:2px; transition:width .4s; }
+.st-n { font-size:8.5px; font-family:'IBM Plex Mono',monospace; color:var(--muted); text-align:right; }
+#stats-total { font-size:8.5px; color:var(--muted); margin-top:5px; }
+
+#tbl-search {
+  width:100%; font-size:10.5px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+  padding:4px 7px; border-radius:4px; outline:none; margin-bottom:5px;
+}
+#tbl-wrap { flex:1; overflow-y:auto; border:1px solid var(--border); border-radius:4px; min-height:0; }
+#tbl-wrap::-webkit-scrollbar { width:3px; }
+#tbl-wrap::-webkit-scrollbar-thumb { background:var(--scr); border-radius:2px; }
+#ctbl { width:100%; border-collapse:collapse; font-size:10px; }
+#ctbl thead th { position:sticky; top:0; background:var(--card); color:var(--muted); font-size:7.5px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; padding:4px 5px; text-align:left; border-bottom:1px solid var(--border); }
+#ctbl tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background .1s; }
+#ctbl tbody tr:hover { background:var(--card); }
+#ctbl td { padding:3px 5px; vertical-align:middle; }
+.t-nom { font-weight:500; font-size:10.5px; }
+.t-code { color:var(--muted); font-family:'IBM Plex Mono',monospace; font-size:8.5px; }
+.t-val { display:flex; align-items:center; gap:3px; font-size:8.5px; font-family:'IBM Plex Mono',monospace; }
+.t-sw { width:5px; height:5px; border-radius:1px; flex-shrink:0; }
+.t-chg { display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--gold); }
+
+#map-area { flex:1; display:flex; overflow:hidden; min-width:0; }
+.mc { flex:1; position:relative; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+.mc + .mc { border-left:3px solid var(--bg); }
+.map-lbl {
+  position:absolute; top:9px; left:50%; transform:translateX(-50%); z-index:500; background:var(--panel);
+  border:1px solid var(--border2); padding:2px 13px; border-radius:20px; font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px; font-weight:500; color:var(--a2); pointer-events:none; white-space:nowrap;
+}
+.lf-map { flex:1; width:100%; }
+.leaflet-container { background:var(--mempty) !important; }
+
+.c-tt { background:var(--panel) !important; border:1px solid var(--border2) !important; border-radius:6px !important; color:var(--text) !important; font-family:'IBM Plex Sans',sans-serif !important; font-size:12px !important; padding:8px 11px !important; box-shadow:0 6px 24px var(--sh) !important; max-width:340px; }
+.tt-nom { font-weight:600; font-size:13px; margin-bottom:2px; }
+.tt-code { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--muted); margin-bottom:5px; }
+.tt-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; font-size:11px; }
+.tt-sw { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.tt-chg { margin-top:4px; font-size:10px; color:var(--gold); }
+.tt-small { font-size:10px; color:var(--muted); margin-top:4px; }
+
+.m-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:2000; align-items:center; justify-content:center; }
+.m-bg.open { display:flex; }
+.m-box { background:var(--panel); border:1px solid var(--border2); border-radius:10px; padding:18px; max-width:94vw; max-height:88vh; overflow-y:auto; box-shadow:0 24px 64px var(--sh); }
+.m-box::-webkit-scrollbar { width:3px; }
+.m-box::-webkit-scrollbar-thumb { background:var(--scr); }
+.m-box h2 { font-family:'Playfair Display',serif; font-size:15px; margin-bottom:2px; }
+.m-sub { font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--muted); margin-bottom:10px; }
+.m-ytog { display:flex; gap:5px; margin-bottom:10px; }
+.yb { padding:3px 11px; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:500; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:4px; transition:all .18s; }
+.yb.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+#m-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin-bottom:11px; }
+.m-nb { display:flex; align-items:center; gap:6px; padding:5px 7px; border-radius:5px; cursor:pointer; border:2px solid transparent; background:var(--bg); color:var(--text); font-size:10px; transition:border-color .14s; text-align:left; width:100%; }
+.m-nb:hover { border-color:rgba(96,165,250,.4); }
+.m-nb.on { border-color:var(--text); }
+.m-nb .sw { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+.m-nlbl { font-weight:700; font-family:'IBM Plex Mono',monospace; font-size:9px; }
+.m-ndsc { font-size:8px; color:var(--muted); margin-top:1px; line-height:1.3; }
+.m-act, .s-act { display:flex; gap:6px; justify-content:flex-end; margin-top:10px; }
+#set-modal { width:460px; }
+.g-hdr { font-size:8px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:9px 0 4px; padding-left:2px; }
+.s-row { display:flex; align-items:center; gap:7px; padding:5px 7px; background:var(--bg); border-radius:4px; margin-bottom:3px; }
+.s-sw { width:18px; height:18px; border-radius:3px; cursor:pointer; border:2px solid rgba(128,128,128,.22); flex-shrink:0; transition:transform .15s; }
+.s-sw:hover { transform:scale(1.2); }
+.s-name { flex:1; font-size:10.5px; }
+.s-key { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--muted); width:44px; text-align:right; }
+#exp-modal { width:460px; }
+.exp-ta { height:120px; resize:vertical; }
+
+
+.tt-sep { border-top:1px solid var(--border); margin:5px 0 4px; }
+.tt-yr-hdr { font-size:8px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:5px 0 3px; }
+.tt-list-row { display:flex; align-items:center; gap:5px; margin-bottom:2px; font-size:10.5px; line-height:1.3; }
+.tt-list-row.winner { font-weight:600; }
+.tt-pct-bar { width:60px; height:3px; background:var(--border); border-radius:2px; flex-shrink:0; }
+.tt-pct-fill { height:100%; border-radius:2px; }
+.tt-pct-val { font-size:9px; font-family:'IBM Plex Mono',monospace; color:var(--muted); flex-shrink:0; width:36px; text-align:right; }
+.tt-crown { font-size:9px; margin-left:2px; }
+.tt-t2-badge { font-size:8px; background:rgba(245,158,11,.18); color:var(--gold); border-radius:3px; padding:1px 4px; margin-left:4px; flex-shrink:0; }
+
+
+/* CSV import panel */
+.csv-panel { border-bottom:1px solid var(--border); padding:9px 11px; flex-shrink:0; }
+.csv-drop { border:1.5px dashed var(--border2); border-radius:6px; padding:8px 10px; text-align:center; font-size:9.5px; color:var(--muted); cursor:pointer; transition:border-color .15s; margin-bottom:6px; }
+.csv-drop:hover, .csv-drop.drag { border-color:var(--accent); color:var(--a2); }
+.csv-yr-tabs { display:flex; gap:3px; margin-bottom:6px; }
+.csv-yr-tab { flex:1; padding:3px 0; font-size:10px; font-family:'IBM Plex Mono',monospace; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:4px; transition:all .15s; text-align:center; }
+.csv-yr-tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+
+/* ─── Éditeur candidats ─────────────────────────────── */
+#ed-modal { width:560px; max-width:96vw; }
+.ed-search-wrap { display:flex; gap:5px; margin-bottom:8px; }
+.ed-search { flex:1; font-size:11px; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:4px 8px; border-radius:4px; outline:none; }
+.ed-search:focus { border-color:var(--accent); }
+.ed-sugg { max-height:140px; overflow-y:auto; border:1px solid var(--border); border-radius:4px; margin-bottom:8px; display:none; }
+.ed-sugg.open { display:block; }
+.ed-sugg-item { padding:4px 8px; font-size:10.5px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.ed-sugg-item:hover { background:var(--card); }
+.ed-sugg-item .es-code { font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--muted); }
+.ed-ctx { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; align-items:center; }
+.ed-ctx-lbl { font-size:9px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.ed-yr-btn,.ed-tour-btn { padding:2px 10px; font-size:10px; font-family:'IBM Plex Mono',monospace; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:4px; transition:all .15s; }
+.ed-yr-btn.on,.ed-tour-btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.ed-rows { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; min-height:40px; }
+.ed-row { display:grid; grid-template-columns:90px 1fr 64px 36px 26px; gap:4px; align-items:center; background:var(--bg); border-radius:4px; padding:4px 6px; border:1px solid var(--border); }
+.ed-row.winner { border-color:var(--ok); }
+.ed-sel,.ed-inp { font-size:10.5px; background:transparent; border:none; color:var(--text); outline:none; width:100%; padding:1px 2px; }
+.ed-sel { background:var(--bg); border:1px solid var(--border); border-radius:3px; }
+.ed-pct { font-size:10.5px; background:transparent; border:none; color:var(--text); outline:none; width:100%; text-align:right; font-family:'IBM Plex Mono',monospace; padding:1px 2px; }
+.ed-chk { accent-color:var(--ok); width:14px; height:14px; cursor:pointer; }
+.ed-del { width:22px; height:22px; border-radius:3px; background:rgba(239,68,68,.15); color:var(--err); border:none; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ed-del:hover { background:rgba(239,68,68,.3); }
+.ed-add-btn { display:flex; align-items:center; gap:4px; padding:3px 8px; font-size:10px; color:var(--a2); background:transparent; border:1px dashed var(--border2); border-radius:4px; cursor:pointer; width:100%; justify-content:center; transition:all .15s; }
+.ed-add-btn:hover { border-color:var(--accent); color:var(--accent); }
+.ed-actions { display:flex; gap:6px; justify-content:flex-end; margin-top:8px; }
+.ed-nu-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.ed-hdr { display:grid; grid-template-columns:90px 1fr 64px 36px 26px; gap:4px; padding:0 6px 3px; }
+.ed-hdr span { font-size:8px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+
+
+/* ── Modal commune étendu ─────────────────────────────────────── */
+#mod-com .m-box { width:540px; }
+.com-tabs { display:flex; gap:4px; margin-bottom:10px; }
+.com-tab { flex:1; padding:4px 0; font-size:10px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+  cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted);
+  border-radius:4px; transition:all .15s; text-align:center; }
+.com-tab.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+#com-mode-cands { display:none; }
+#com-mode-cands.active { display:block; }
+#com-mode-nuance { display:none; }
+#com-mode-nuance.active { display:block; }
+.cand-tour-tabs { display:flex; gap:3px; margin-bottom:8px; }
+.cand-tour-btn { padding:2px 14px; font-size:10px; font-family:'IBM Plex Mono',monospace; cursor:pointer;
+  border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:4px; transition:all .15s; }
+.cand-tour-btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.cand-tour-btn:disabled { opacity:.35; cursor:not-allowed; pointer-events:none; }
+.cand-tour-btn.t2-locked { opacity:.35; cursor:not-allowed; pointer-events:none; }
+.cand-rows { display:flex; flex-direction:column; gap:3px; margin-bottom:6px; }
+.cand-row { display:grid; grid-template-columns:96px 1fr 58px 34px 20px 20px 20px; gap:3px; align-items:center;
+  background:var(--bg); border-radius:4px; padding:3px 5px; border:1px solid var(--border); }
+.cand-row.winner { border-color:var(--ok); }
+.cand-hdr { display:grid; grid-template-columns:96px 1fr 58px 34px 20px 20px 20px; gap:3px; padding:0 5px 3px; }
+.cand-hdr span { font-size:7.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); }
+.cand-nu-sel { font-size:10px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+  border-radius:3px; padding:1px 3px; width:100%; }
+.cand-inp { font-size:10.5px; background:transparent; border:none; color:var(--text); width:100%; padding:1px 2px; outline:none; }
+.cand-inp:focus { background:var(--card); border-radius:2px; }
+.cand-pct { font-size:10.5px; background:transparent; border:none; color:var(--text); width:100%;
+  text-align:right; font-family:'IBM Plex Mono',monospace; padding:1px 2px; outline:none; }
+.cand-pct:focus { background:var(--card); border-radius:2px; }
+.cand-chk { accent-color:var(--ok); width:14px; height:14px; cursor:pointer; }
+.cand-del { width:20px; height:20px; border-radius:3px; background:rgba(239,68,68,.12); color:var(--err);
+  border:none; cursor:pointer; font-size:11px; display:flex; align-items:center; justify-content:center; }
+.cand-del:hover { background:rgba(239,68,68,.28); }
+.cand-add { display:flex; align-items:center; justify-content:center; gap:4px; width:100%; padding:3px;
+  font-size:10px; color:var(--a2); background:transparent; border:1px dashed var(--border2); border-radius:4px;
+  cursor:pointer; transition:all .15s; }
+.cand-add:hover { border-color:var(--accent); color:var(--accent); }
+.cand-winner-badge { font-size:8.5px; color:var(--ok); margin-left:4px; }
+.com-save-hint { font-size:9px; color:var(--muted); font-style:italic; margin-top:4px; line-height:1.4; }
+/* ── Liste communes renseignées dans l'éditeur ────────────────── */
+.ed-filled-list { max-height:160px; overflow-y:auto; border:1px solid var(--border); border-radius:4px;
+  margin-bottom:10px; }
+.ed-filled-list::-webkit-scrollbar { width:3px; }
+.ed-filled-list::-webkit-scrollbar-thumb { background:var(--scr); }
+.ed-filled-item { display:flex; align-items:center; justify-content:space-between; padding:4px 8px;
+  font-size:10.5px; cursor:pointer; border-bottom:1px solid var(--border); gap:6px; }
+.ed-filled-item:last-child { border-bottom:none; }
+.ed-filled-item:hover { background:var(--card); }
+.ed-filled-dots { display:flex; gap:2px; }
+.ed-filled-dot { width:6px; height:6px; border-radius:1px; }
+.ed-filled-yr { font-size:8px; font-family:'IBM Plex Mono',monospace; color:var(--muted); flex-shrink:0; }
+
+
+.tt-nu-badge { font-size:8.5px; font-family:'IBM Plex Mono',monospace; color:var(--muted);
+  margin-left:2px; white-space:nowrap; flex-shrink:0; }
+.tt-nu-label { font-size:8px; color:var(--muted); flex-shrink:0; max-width:90px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cand-nu-wrap { display:flex; align-items:center; gap:3px; }
+.cand-nu-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+
+
+.tt-yr-main { font-size:10px; font-weight:700; letter-spacing:.06em; color:var(--a2); margin-bottom:4px; }
+.tt-yr-other { font-size:7px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:6px 0 2px; opacity:.6; }
+.tt-other-block { opacity:.55; }
+.tt-other-block .tt-list-row { font-size:8.5px; margin-bottom:0px; line-height:1.2; }
+.tt-other-block .tt-list-row .tt-sublabel { display:none; }
+.tt-other-block .tt-pct-bar { width:30px; }
+.tt-other-block .tt-pct-val { font-size:7.5px; width:28px; }
+.tt-other-block .tt-nu-badge { font-size:7px; }
+
+
+/* ── Désistements ──────────────────────────────────────────────── */
+.cand-row.desist { opacity:.5; border-style:dashed; }
+.desist-btn { width:20px; height:20px; border-radius:3px; background:rgba(245,158,11,.15); color:var(--gold);
+  border:none; cursor:pointer; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.desist-btn:hover { background:rgba(245,158,11,.3); }
+.desist-btn.active { background:rgba(245,158,11,.4); color:#fff; }
+.tt-desist { font-size:7.5px; color:var(--gold); font-style:italic; margin-left:3px; }
+
+/* ── Mode résultats du soir ─────────────────────────────────────── */
+.tbtn.soir-on { background:#22c55e; color:#fff; border-color:#22c55e; }
+.pending-overlay { pointer-events:none; }
+
+/* ── Filtre par bloc ────────────────────────────────────────────── */
+.bloc-filter-wrap { display:flex; flex-wrap:wrap; gap:3px; margin-top:5px; }
+.bloc-btn { padding:2px 7px; font-size:9px; font-weight:600; cursor:pointer; border:1.5px solid transparent;
+  border-radius:12px; transition:all .15s; white-space:nowrap; opacity:.7; }
+.bloc-btn:hover { opacity:1; }
+.bloc-btn.on { opacity:1; border-color:var(--text) !important; }
+.bloc-btn.all { border:1.5px solid var(--border2); color:var(--muted); background:var(--bg); }
+.bloc-btn.all.on { border-color:var(--text); color:var(--text); }
+
+/* ── Légende interactive ────────────────────────────────────────── */
+.chip.highlight { box-shadow:0 0 0 3px rgba(255,255,255,.5); }
+
+/* ── Étiquettes communes ────────────────────────────────────────── */
+.commune-label-wrap { width:0; height:0; overflow:visible; }
+.commune-label { position:absolute; transform:translate(-50%,-50%);
+  font-family:'IBM Plex Sans',sans-serif; font-size:9px; font-weight:600;
+  color:#dce8f5; text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.8);
+  white-space:nowrap; pointer-events:none; line-height:1; }
+[data-theme="light"] .commune-label { color:#1a2d42; text-shadow:0 1px 2px rgba(255,255,255,.9),0 0 6px rgba(255,255,255,.7); }
+
+
+.fusion-btn { width:20px; height:20px; border-radius:3px; background:rgba(96,165,250,.12); color:var(--a2);
+  border:none; cursor:pointer; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.fusion-btn:hover { background:rgba(96,165,250,.3); }
+.fusion-btn.active { background:var(--accent); color:#fff; }
+.fusion-btn.fused { background:rgba(96,165,250,.35); color:#fff; }
+.cand-row.fusion-target { border-color:var(--accent); box-shadow:0 0 0 1.5px var(--accent); position:relative; cursor:pointer; }
+.cand-row.fusion-target::after { content:"▶ Choisir"; position:absolute; inset:0; background:rgba(59,130,246,.12);
+  display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:var(--accent);
+  letter-spacing:.08em; cursor:pointer; z-index:10; }
+.cand-row.fusion-source-active { pointer-events:none; opacity:.6; }
+.cand-row.fused-in { opacity:.65; border-style:dashed; border-color:var(--a2); }
+.tt-fusion-item { font-size:8px; color:var(--a2); padding:1px 0 1px 18px; line-height:1.3; display:flex; align-items:center; gap:4px; }
+.tt-fusion-item .tt-sw { width:6px; height:6px; border-radius:1px; flex-shrink:0; }
+
+
+/* ── Live sync indicator ───────────────────────────────────────── */
+#live-indicator { display:none; align-items:center; gap:4px; font-size:9px;
+  color:var(--muted); flex-shrink:0; padding:0 4px; }
+#live-indicator.on { display:flex; }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--ok);
+  animation:pulse-dot 2s ease-in-out infinite; flex-shrink:0; }
+.live-dot.stale { background:var(--gold); animation:none; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+/* ── Config GitHub sync ─────────────────────────────────────────── */
+#gh-modal { width:480px; }
+.gh-row { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+.gh-lbl { font-size:9px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.gh-inp { width:100%; font-size:11px; background:var(--bg); border:1px solid var(--border); color:var(--text);
+  padding:5px 8px; border-radius:4px; outline:none; font-family:'IBM Plex Mono',monospace; }
+.gh-inp:focus { border-color:var(--accent); }
+.gh-status { font-size:9px; padding:4px 8px; border-radius:4px; margin-top:6px; display:none; line-height:1.4; }
+.gh-status.ok { background:rgba(34,197,94,.12); color:var(--ok); display:block; }
+.gh-status.er { background:rgba(239,68,68,.12); color:var(--err); display:block; }
+.gh-status.loading { background:rgba(96,165,250,.1); color:var(--a2); display:block; }
+#gh-sync-btn { position:relative; }
+#gh-sync-btn.syncing::after { content:''; position:absolute; right:6px; top:50%; transform:translateY(-50%);
+  width:8px; height:8px; border:1.5px solid #fff; border-top-color:transparent;
+  border-radius:50%; animation:spin .6s linear infinite; }
+
+
+/* ── Panneau notifications (overlay centré) ─────────────────────── */
+#notif-panel {
+  position:fixed; top:0; left:0; width:0; height:0; overflow:visible;
+  z-index:3000; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px;
+}
+#notif-panel-inner {
+  position:fixed; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px;
+  pointer-events:none; z-index:3000;
+}
+.notif-card {
+  background:var(--panel); border:1px solid var(--border2); border-radius:14px;
+  padding:20px 26px; min-width:380px; max-width:520px; width:90vw;
+  box-shadow:0 24px 80px rgba(0,0,0,.7); pointer-events:all;
+  animation:notif-in .3s cubic-bezier(.2,.8,.3,1.2);
+}
+.notif-card.out { animation:notif-out .3s ease forwards; }
+@keyframes notif-in  { from{opacity:0;transform:scale(.85) translateY(-20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes notif-out { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(.9) translateY(10px)} }
+.notif-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:8px; }
+.notif-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color:var(--a2); }
+.notif-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px;
+  line-height:1; padding:0 3px; flex-shrink:0; transition:color .15s; }
+.notif-close:hover { color:var(--text); }
+.notif-item { display:flex; align-items:flex-start; gap:8px; padding:6px 0;
+  border-top:1px solid var(--border); line-height:1.4; }
+.notif-item:first-of-type { border-top:none; padding-top:2px; }
+.notif-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; margin-top:3px; }
+.notif-body { flex:1; min-width:0; }
+.notif-nom { font-weight:700; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.notif-meta { color:var(--muted); font-size:11px; margin-top:1px; }
+.notif-time { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); flex-shrink:0; white-space:nowrap; }
+.notif-progress { height:3px; background:var(--border); border-radius:2px; margin-top:12px; overflow:hidden; }
+.notif-progress-bar { height:100%; background:var(--a2); border-radius:2px; 
+  animation:notif-progress linear forwards; }
+@keyframes notif-progress { from{width:100%} to{width:0%} }
+/* Historique */
+.hist-panel { background:var(--panel); border:1px solid var(--border2); border-radius:10px;
+  padding:12px; width:380px; max-height:60vh; overflow-y:auto; box-shadow:0 12px 40px var(--sh); }
+.hist-panel::-webkit-scrollbar { width:3px; }
+.hist-panel::-webkit-scrollbar-thumb { background:var(--scr); border-radius:2px; }
+
+
+/* ── Alerte sync en cours ───────────────────────────────────────── */
+#sync-alert {
+  position:fixed; top:58px; right:10px; z-index:2900;
+  background:var(--gold); color:#000; border-radius:7px;
+  padding:7px 13px 7px 10px; font-size:10px; font-weight:600;
+  display:none; align-items:center; gap:7px;
+  box-shadow:0 4px 18px rgba(0,0,0,.35); animation:notif-in .25s ease;
+}
+#sync-alert.visible { display:flex; }
+#sync-alert .sync-spin { width:10px; height:10px; border:2px solid rgba(0,0,0,.25);
+  border-top-color:#000; border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
+
+
+
+
+/* ── Communes T2 en attente : pulsation douce ───────────────────── */
+.leaflet-interactive.pending-hatch {
+  animation: pending-pulse 2.5s ease-in-out infinite;
+}
+@keyframes pending-pulse {
+  0%,100% { fill-opacity: 0.75; stroke-opacity: 1; }
+  50%      { fill-opacity: 0.35; stroke-opacity: 0.6; }
+}
+
+.leaflet-control-layers-expanded { background:var(--panel); color:var(--text); border:1px solid var(--border2); }
+@media (max-width: 1100px) { #sidebar{ width:290px; min-width:290px } #sb-tab{ left:290px } }
+</style>
+</head>
+<body>
+<div id="loading">
+  <h1>Carte Électorale Municipales<br>Bouches-du-Rhône</h1>
+  <div class="spin"></div>
+  <p>Chargement des communes et des secteurs de Marseille…</p>
+</div>
+
+<div id="topbar">
+  <span id="topbar-title">Carte Électorale — <em>Bouches-du-Rhône</em></span>
+  <div class="tb-sep"></div>
+  <div class="combo-wrap" id="combo-wrap">
+    <button class="tbtn yr-on" id="yr-btn-2014" onclick="toggleYear(2014,this)">2014</button>
+    <button class="tbtn yr-on" id="yr-btn-2020" onclick="toggleYear(2020,this)">2020</button>
+    <button class="tbtn yr-on" id="yr-btn-2026" onclick="toggleYear(2026,this)">2026</button>
+  </div>
+  <button class="tbtn" id="marseille-tab-btn" onclick="toggleViewMode()">🏙 Marseille — Secteurs</button>
+  <button class="tbtn" id="label-btn" onclick="toggleLabels()" title="Afficher / masquer les noms des communes">𝐴 Étiquettes</button>
+  <button class="tbtn" id="soir-btn" onclick="toggleSoirMode()" title="Griser les communes en attente du 2nd tour">🌙 Soir</button>
+  <button class="tbtn" onclick="openEditor()">✎ Candidats</button>
+  <button class="tbtn" onclick="openSettings()">⚙ Couleurs</button>
+  <button class="tbtn" id="gh-sync-btn" onclick="ghSync()" title="Synchroniser avec GitHub">⟳ GitHub</button>
+  <div id="live-indicator" title="Actualisation automatique active"><span class="live-dot" id="live-dot"></span><span id="live-txt">live</span></div>
+  <button class="tbtn" onclick="openGhConfig()" title="Configurer la synchronisation GitHub">⚙ GitHub</button>
+  <button class="tbtn" onclick="openExport()">⬇ Export / Import</button>
+  <button class="tbtn" onclick="doReset()">↺ Réinit.</button>
+  <div id="theme-btn" onclick="toggleTheme()"><span id="th-ico">☀</span><span id="th-txt">Mode clair</span></div>
+</div>
+
+
+
+<div id="app">
+  <div id="sidebar">
+    <div id="sb-inner">
+      <div class="sec" style="padding:6px 11px;flex-direction:row;display:flex;align-items:center;justify-content:space-between;gap:6px">
+        <span class="sh" style="margin:0">Saisies</span>
+        <button class="bs" style="font-size:9px;padding:2px 8px" onclick="toggleHistory()">📋 Historique</button>
+      </div>
+      <div class="sec">
+        <div class="sh">Nuance active — <em>cliquer pour sélectionner</em></div>
+        <div id="palette"></div>
+        <div id="hint">Sélectionnez une nuance puis cliquez sur une commune ou un secteur de Marseille.</div>
+      </div>
+
+
+      <div class="csv-panel">
+        <div class="sh">Import CSV <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:8px">— résultats par liste</span></div>
+        <div class="csv-drop" id="csv-drop" onclick="document.getElementById('csv-file-in').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleCsvDrop(event)">
+          ⬆ Glisser un CSV ou cliquer pour choisir<br>
+          <span style="font-size:8px">Format : code_insee;nom;annee;tour;nuance;tete_liste;pct_voix;elu</span>
+        </div>
+        <input type="file" id="csv-file-in" accept=".csv,.txt" style="display:none" onchange="handleCsvFile(this)">
+        <div class="csv-yr-tabs">
+          <div class="csv-yr-tab on" onclick="setCsvYr(2014,this)">2014</div>
+          <div class="csv-yr-tab" onclick="setCsvYr(2020,this)">2020</div>
+          <div class="csv-yr-tab" onclick="setCsvYr(2026,this)">2026</div>
+          <div class="csv-yr-tab" onclick="setCsvYr('all',this)">Tous</div>
+        </div>
+        <div class="fb" id="csv-imp-fb"></div>
+      </div>
+
+      <div class="sec">
+        <div class="sh">Filtre par bloc</div>
+        <div class="bloc-filter-wrap" id="bloc-filter">
+          <button class="bloc-btn all on" onclick="setBloc(null,this)">Tous</button>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sh">Résultats — <em id="stats-yr">2014</em></div>
+        <div id="stats-wrap"></div>
+        <div id="stats-total"></div>
+      </div>
+
+      <div class="sec grow">
+        <div class="sh">Communes / Marseille</div>
+        <input type="text" id="tbl-search" placeholder="Rechercher…" oninput="filterTbl(this.value)">
+        <div id="tbl-wrap">
+          <table id="ctbl">
+            <thead><tr>
+              <th>Nom</th><th>Code</th><th>2014</th><th>2020</th><th>2026</th><th>Δ</th>
+            </tr></thead>
+            <tbody id="tbl-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="sb-tab" onclick="toggleSidebar()">&#8249;</div>
+
+  <div id="map-area"></div>
+</div>
+
+<div id="mod-com" class="m-bg" onclick="closeMod(event,'mod-com')">
+  <div class="m-box">
+    <h2 id="m-title"></h2>
+    <div class="m-sub" id="m-sub"></div>
+
+    <!-- Année -->
+    <div class="m-ytog" style="margin-bottom:8px">
+      <button class="yb on" id="my-2014" onclick="setModYear(2014)">2014</button>
+      <button class="yb" id="my-2020" onclick="setModYear(2020)">2020</button>
+      <button class="yb" id="my-2026" onclick="setModYear(2026)">2026</button>
+    </div>
+
+    <!-- Onglets mode -->
+    <div class="com-tabs">
+      <button class="com-tab on" id="com-tab-cands" onclick="setComMode('cands',this)">✎ Candidats & résultats</button>
+      <button class="com-tab" id="com-tab-nuance" onclick="setComMode('nuance',this)">Nuance directe</button>
+    </div>
+
+    <!-- Mode candidats -->
+    <div id="com-mode-cands" class="active">
+      <div class="cand-tour-tabs">
+        <button class="cand-tour-btn on" id="com-tour-T1" onclick="setComTour('T1',this)">1er tour</button>
+        <button class="cand-tour-btn" id="com-tour-T2" onclick="setComTour('T2',this)">2nd tour</button>
+      </div>
+      <div class="cand-hdr">
+        <span>Nuance</span><span>Tête de liste</span><span style="text-align:right">%</span>
+        <span style="text-align:center" title="Liste gagnante">✓</span><span style="text-align:center" title="Désistement">D</span><span style="text-align:center" title="Fusion">F</span><span></span>
+      </div>
+      <div class="cand-rows" id="com-cand-rows"></div>
+      <button class="cand-add" onclick="comCandAdd()">+ Ajouter une liste</button>
+      <div class="com-save-hint" id="com-save-hint"></div>
+      <div class="fb" id="com-cand-fb" style="margin-top:5px"></div>
+    </div>
+
+    <!-- Mode nuance simple -->
+    <div id="com-mode-nuance">
+      <div id="m-grid"></div>
+    </div>
+
+    <div class="m-act" style="margin-top:10px">
+      <button class="bs" onclick="clearCom()">Effacer l'année</button>
+      <button class="bs" onclick="forceClose('mod-com')">Fermer</button>
+      <button class="bp" id="com-save-btn" onclick="comCandSave()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="mod-set" class="m-bg" onclick="closeMod(event,'mod-set')">
+  <div class="m-box" id="set-modal">
+    <h2>Paramétrage des couleurs</h2>
+    <div id="set-rows"></div>
+    <div class="s-act">
+      <button class="bs" onclick="resetColors()">Réinitialiser</button>
+      <button class="bp" onclick="forceClose('mod-set')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<div id="mod-exp" class="m-bg" onclick="closeMod(event,'mod-exp')">
+  <div class="m-box" id="exp-modal">
+    <h2>Export / Import — Sauvegarde</h2>
+    <p style="font-size:10.5px;color:var(--muted);margin:6px 0 12px;line-height:1.55">
+      Exporte les données en JSON. L’import restaure les résultats des communes et des secteurs de Marseille.
+    </p>
+    <div class="sh" style="margin-bottom:5px">Export</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="bp" onclick="exportJSON()">⬇ Télécharger JSON</button>
+      <button class="bs" onclick="copyJSON()">⧉ Copier</button>
+    </div>
+    <div class="sh" style="margin-bottom:5px">Import — coller un JSON de sauvegarde</div>
+    <textarea id="imp-area" class="exp-ta" placeholder='{"communes":{"2014":{"13001":"LLR"}},"marseilleSecteurs":{"2014":{"S1":"LLR"}}}'></textarea>
+    <div class="fb" id="exp-fb"></div>
+    <div class="m-act">
+      <button class="bs" onclick="forceClose('mod-exp')">Fermer</button>
+      <button class="bp" onclick="importJSON()">Importer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+const YEARS = [2014, 2020, 2026];
+const SECTOR_MAP = {
+  "13201":"S1", "13207":"S1",
+  "13202":"S2", "13203":"S2",
+  "13204":"S3", "13205":"S3",
+  "13206":"S4", "13208":"S4",
+  "13209":"S5", "13210":"S5",
+  "13211":"S6", "13212":"S6",
+  "13213":"S7", "13214":"S7",
+  "13215":"S8", "13216":"S8"
+};
+const SECTOR_LABELS = {
+  S1:"Secteur 1 (1er & 7e)", S2:"Secteur 2 (2e & 3e)", S3:"Secteur 3 (4e & 5e)", S4:"Secteur 4 (6e & 8e)",
+  S5:"Secteur 5 (9e & 10e)", S6:"Secteur 6 (11e & 12e)", S7:"Secteur 7 (13e & 14e)", S8:"Secteur 8 (15e & 16e)"
+};
+
+const NU_DEF = {
+  LEXG:{label:"Extrême gauche",color:"#6b0000",g:"exg"}, LFI:{label:"La France Insoumise",color:"#b5002b",g:"g"},
+  LCOM:{label:"Parti Communiste Français",color:"#c62828",g:"g"}, LSOC:{label:"Parti Socialiste",color:"#e91e8c",g:"g"},
+  LVEC:{label:"Les Écologistes",color:"#1b5e20",g:"g"}, LUG:{label:"Union de la gauche",color:"#a01060",g:"g"},
+  LDVG:{label:"Divers gauche",color:"#f06292",g:"g"}, LECO:{label:"Écologiste (hors Les Éco.)",color:"#388e3c",g:"g"},
+  LREG:{label:"Régionalistes / autonomistes",color:"#7b1fa2",g:"g"}, LDIV:{label:"Divers",color:"#78909c",g:"div"},
+  LREN:{label:"Renaissance",color:"#d4a000",g:"c"}, LMDM:{label:"MoDem",color:"#f57c00",g:"c"},
+  LHOR:{label:"Horizons",color:"#ef8c00",g:"c"}, LUDI:{label:"UDI",color:"#42a5f5",g:"c"},
+  LUC:{label:"Union du centre",color:"#64b5f6",g:"c"}, LDVC:{label:"Divers centre",color:"#90caf9",g:"c"},
+  LLR:{label:"Les Républicains",color:"#1565c0",g:"dr"}, LUD:{label:"Union de la droite",color:"#0d3a8e",g:"dr"},
+  LDVD:{label:"Divers droite",color:"#5e8fcc",g:"dr"}, LDSV:{label:"Droite souverainiste",color:"#0a265e",g:"dr"},
+  LUDR:{label:"Union des droites pour la République",color:"#08194a",g:"dr"}, LRN:{label:"Rassemblement National",color:"#1a1a7e",g:"exd"},
+  LREC:{label:"Reconquête",color:"#4a0808",g:"exd"}, LUXD:{label:"Union de l'extrême droite",color:"#2e0a0a",g:"exd"},
+  LEXD:{label:"Extrême droite",color:"#1c1c1c",g:"exd"}
+};
+
+// ─── Helpers for rich/simple data format ───────────────
+function getNuanceStr(entry){
+  if(!entry) return null;
+  if(typeof entry === 'string') return NU[entry] ? entry : null;
+  if(typeof entry !== 'object') return null;
+  // Recalcul live : on ne fait jamais confiance à .nuance stocké pour les riches
+  // car le T2 peut être en attente (tous pct=0) ou d'autres états intermédiaires
+  const eluNuance = ((entry.t2||[]).find(l=>l.elu) || (entry.t1||[]).find(l=>l.elu))?.nuance || null;
+  const computed = resolveWinner(entry.t1, entry.t2, eluNuance);
+  // Mettre à jour le cache .nuance pour cohérence avec l'export
+  if(computed !== entry.nuance) entry.nuance = computed;
+  return computed;
+}
+function getRich(entry){ return (entry && typeof entry === 'object') ? entry : null; }
+
+
+// ── Pré-remplit T2 avec les candidats T1 >= 10 % si T2 vide ──────
+function prefillT2FromT1(rich){
+  if(!rich || !rich.t1 || !rich.t1.length) return;
+  if(rich.t2 && rich.t2.length) return;
+  if(rich.t1[0].pct > 50) return;
+  // Séparer : qualifiés ≥10 % selon leur statut
+  const qualified  = rich.t1.filter(l => l.pct >= 10);  // tous les ≥10 %
+  const fused      = rich.t1.filter(l => l.fusedInto);  // fusionnés (≥5 %)
+  const standalone = qualified.filter(l => !l.fusedInto); // autonomes non fusionnés
+  if(standalone.length < 2 && !qualified.some(l => l.desist)) return;
+  // Construire le T2 : tous les qualifiés autonomes, avec leur statut
+  rich.t2 = qualified.filter(l => !l.fusedInto).map(l => {
+    const row = {nuance:l.nuance, tete:l.tete, pct:0};
+    if(l.desist) row.desist = true;  // désisté → barré dans T2
+    // Attacher les listes fusionnées vers cette liste (seulement si non désisté)
+    if(!l.desist){
+      const fusedToMe = fused.filter(f =>
+        f.fusedInto.nuance === l.nuance &&
+        (f.fusedInto.tete === l.tete || !f.fusedInto.tete)
+      );
+      if(fusedToMe.length) row.fusions = fusedToMe.map(f => ({nuance:f.nuance, tete:f.tete, pct:f.pct}));
+    }
+    return row;
+  });
+}
+// ── Règle d'élection : gagnant uniquement si T2 présent, ou T1 > 50 %, ou elu coché ──
+function resolveWinner(t1, t2, eluNuance){
+  // T2 avec résultats réels (au moins un candidat a un % > 0)
+  const t2Real = t2 ? t2.filter(l => !l.desist) : [];
+  const t2HasResults = t2Real.length > 0 && t2Real.some(l => l.pct > 0);
+  if(t2HasResults){
+    const eluT2 = t2Real.find(l => l.elu);
+    return (eluT2 || t2Real[0]).nuance;
+  }
+  // Elu explicitement coché dans T1 (liste unique, < 1000 hab, décision manuelle)
+  if(eluNuance) return eluNuance;
+  // T1 : chercher une liste marquée élue
+  if(t1){
+    const eluT1 = t1.find(l => l.elu);
+    if(eluT1) return eluT1.nuance;
+  }
+  // T1 seulement : élu uniquement si > 50 %
+  if(t1 && t1.length && t1[0].pct > 50) return t1[0].nuance;
+  // Pas encore élu : T2 en attente ou < 50 % au T1
+  return null;
+}
+const GRPS = [
+  {id:"exg", label:"Extrême gauche"}, {id:"g", label:"Gauche"}, {id:"div", label:"Divers"},
+  {id:"c", label:"Centre"}, {id:"dr", label:"Droite"}, {id:"exd", label:"Extrême droite"}
+];
+
+let NU = JSON.parse(JSON.stringify(NU_DEF));
+let RES = { communes:{2014:{}, 2020:{}, 2026:{}}, marseilleSecteurs:{2014:{}, 2020:{}, 2026:{}} };
+let visibleYears = [2014, 2020, 2026];
+let curStatYear = 2014;
+let geoData = null;
+let marseilleSectorData = null;
+let maps = [];
+let selN = null;
+let modRef = null;
+let modYear = 2014;
+let tblQ = '';
+let isDark = true;
+let sbOpen = true;
+let viewMode = 'dept'; // 'dept' | 'marseille'
+let soirMode = false;
+let activeBloc = null;    // null = tous, sinon id bloc (exg/g/div/c/dr/exd)
+let highlightN = null;    // nuance surlignée dans légende
+let labelLayers = [];     // couches étiquettes par carte
+let showLabels = false;   // étiquettes masquées par défaut
+let fusionSourceRow = null;  // ligne en cours de fusion
+
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const [communes, marseilleSectors] = await Promise.all([
+      fetchJSON('https://geo.api.gouv.fr/departements/13/communes?geometry=contour&format=geojson&fields=nom,code'),
+      fetchJSON('https://data.ampmetropole.fr/api/explore/v2.1/catalog/datasets/fr-codes-communes-et-secteurs-de-la-metropole/exports/geojson').catch(() => null)
+    ]);
+
+    geoData = communes;
+    marseilleSectorData = normalizeMarseilleSectorData(marseilleSectors);
+    document.getElementById('loading').style.display = 'none';
+    await autoLoadJSON(false);
+    buildPalette();
+    buildBlocFilter();
+    buildMaps();
+    updateGhBtn();
+    const _ghCfg = ghGetConfig();
+    if(_ghCfg.poll) ghStartPolling();
+    syncYearBtns();
+    renderStats();
+    renderTable();
+  } catch(e) {
+    document.getElementById('loading').querySelector('p').textContent = 'Erreur de chargement. Vérifiez la connexion internet ou les URLs des données.';
+    console.error(e);
+  }
+});
+
+async function fetchJSON(url){
+  const r = await fetch(url);
+  if(!r.ok) throw new Error('HTTP '+r.status+' — '+url);
+  return r.json();
+}
+const SECTOR_MAP_ARR = {
+  "13201":"S1","13207":"S1","13202":"S2","13203":"S2",
+  "13204":"S3","13205":"S3","13206":"S4","13208":"S4",
+  "13209":"S5","13210":"S5","13211":"S6","13212":"S6",
+  "13213":"S7","13214":"S7","13215":"S8","13216":"S8"
+};
+function normalizeMarseilleSectorData(data){
+  // Try AMP API data first
+  if(data && data.features && data.features.length){
+    const out = [];
+    for(const f of data.features){
+      const props = f?.properties || {};
+      const sec = detectSectorId(props);
+      if(!sec || !f.geometry) continue;
+      out.push({type:'Feature', geometry:f.geometry, properties:{...props, _sector:sec, _label:SECTOR_LABELS[sec]||sec}});
+    }
+    const dedup = new Map();
+    out.forEach(f => { if(!dedup.has(f.properties._sector)) dedup.set(f.properties._sector, f); });
+    if(dedup.size >= 8) return {type:'FeatureCollection', features:[...dedup.values()].sort((a,b)=>a.properties._sector.localeCompare(b.properties._sector))};
+  }
+  // Fallback: build from arrondissements in geoData
+  return buildSectorDataFromArrondissements();
+}
+function buildSectorDataFromArrondissements(){
+  if(!geoData) return {type:'FeatureCollection', features:[]};
+  // Group arrondissement features by sector
+  const bySec = {};
+  for(const f of geoData.features){
+    const code = f.properties.code;
+    const sec = SECTOR_MAP_ARR[code];
+    if(!sec) continue;
+    if(!bySec[sec]) bySec[sec] = [];
+    bySec[sec].push(f);
+  }
+  const features = [];
+  for(const [sec, arr] of Object.entries(bySec)){
+    // Use the first arrondissement's geometry as the sector representative
+    // (multiple arrondissements per sector will show individually but with same sector data)
+    for(const f of arr){
+      features.push({
+        type:'Feature',
+        geometry: f.geometry,
+        properties: { _sector: sec, _label: SECTOR_LABELS[sec]||sec, _arrCode: f.properties.code }
+      });
+    }
+  }
+  return {type:'FeatureCollection', features: features.sort((a,b)=>a.properties._sector.localeCompare(b.properties._sector))};
+}
+function detectSectorId(props){
+  const vals = Object.values(props).map(v => String(v ?? '').trim()).filter(Boolean);
+  for(const v of vals){
+    let m = v.match(/^S\s*([1-8])$/i);
+    if(m) return 'S' + m[1];
+    m = v.match(/(?:^|\b)([1-8])(?:er|e)?\s*secteur(?:\b|$)/i);
+    if(m) return 'S' + m[1];
+    m = v.match(/secteur\s*([1-8])(?:er|e)?/i);
+    if(m) return 'S' + m[1];
+  }
+  return null;
+}
+function detectSectorName(props, sec){
+  const vals = Object.values(props).map(v => String(v ?? '').trim()).filter(Boolean);
+  return vals.find(v => /secteur/i.test(v)) || SECTOR_LABELS[sec] || sec;
+}
+
+
+// ─── Sector key helper ───────────────────────────────────────────────────────
+function normalizeSectorKey(v){
+  if(!v) return null;
+  const s = String(v).trim();
+  if(SECTOR_LABELS[s]) return s;
+  const m = s.match(/^S?([1-8])$/i);
+  if(m) return 'S'+m[1];
+  return null;
+}
+// ─── Import CSV résultats ─────────────────────────────────────────────────
+let csvImportYr = 2014;
+function setCsvYr(yr, el){
+  csvImportYr = yr;
+  document.querySelectorAll('.csv-yr-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+}
+function handleCsvDrop(e){
+  e.preventDefault();
+  document.getElementById('csv-drop').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if(file) readCsvFile(file);
+}
+function handleCsvFile(inp){
+  const file = inp.files[0];
+  if(file) readCsvFile(file);
+  inp.value = '';
+}
+function readCsvFile(file){
+  const reader = new FileReader();
+  reader.onload = e => importCsvText(e.target.result, file.name);
+  reader.readAsText(file, 'utf-8');
+}
+function importCsvText(raw, filename=''){
+  const fb = document.getElementById('csv-imp-fb');
+  try {
+    const lines = raw.replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(l=>l && !l.startsWith('#'));
+    if(!lines.length){ showFB(fb,'er','Fichier vide.'); return; }
+    // Détect délimiteur
+    const delim = [';','\t',',','|'].sort((a,b) => lines[0].split(b).length - lines[0].split(a).length)[0] || ';';
+    const hdr = lines[0].split(delim).map(h => h.trim().toLowerCase().replace(/[^a-z_]/g,''));
+    const idx = {
+      code: hdr.findIndex(h => ['code_insee','code','secteur','sec'].includes(h)),
+      annee: hdr.findIndex(h => ['annee','year','an'].includes(h)),
+      tour: hdr.findIndex(h => ['tour','round'].includes(h)),
+      nuance: hdr.findIndex(h => ['nuance','nu'].includes(h)),
+      tete: hdr.findIndex(h => ['tete_liste','tete','candidat','nom_liste','liste'].includes(h)),
+      pct: hdr.findIndex(h => ['pct_voix','pct','pourcentage','pct_voix_exp'].includes(h)),
+      elu: hdr.findIndex(h => ['elu','gagnant','winner','elected'].includes(h)),
+    };
+    let ok=0, skipped=0;
+    // Grouper par (code, annee)
+    const byKey = {};
+    for(const line of lines.slice(1)){
+      const cols = line.split(delim).map(v => v.trim().replace(/^"+|"+$/g,'').trim());
+      const code = idx.code>=0 ? cols[idx.code] : '';
+      if(!code) { skipped++; continue; }
+      const anneeRaw = idx.annee>=0 ? parseInt(cols[idx.annee]) : csvImportYr;
+      const annee = [2014,2020,2026].includes(anneeRaw) ? anneeRaw : (csvImportYr === 'all' ? null : csvImportYr);
+      if(!annee) { skipped++; continue; }
+      const tour = idx.tour>=0 ? cols[idx.tour].toUpperCase() : 'T1';
+      const nuance = idx.nuance>=0 ? cols[idx.nuance].trim().toUpperCase() : '';
+      if(!NU[nuance]) { skipped++; continue; }
+      const tete = idx.tete>=0 ? cols[idx.tete] : nuance;
+      const pct = idx.pct>=0 ? parseFloat(cols[idx.pct].replace(',','.')) || 0 : 0;
+      const elu = idx.elu>=0 ? (cols[idx.elu]==='1'||cols[idx.elu].toLowerCase()==='oui'||cols[idx.elu].toLowerCase()==='true') : false;
+      const key = code+'|'+annee;
+      if(!byKey[key]) byKey[key] = {code, annee, lists:[]};
+      byKey[key].lists.push({tour, nuance, tete, pct, elu});
+      ok++;
+    }
+    // Injecter dans RES
+    let injected = 0;
+    for(const {code, annee, lists} of Object.values(byKey)){
+      // Séparer T1 et T2
+      const t1 = lists.filter(l=>l.tour==='T1').sort((a,b)=>b.pct-a.pct).map(({nuance,tete,pct})=>({nuance,tete,pct}));
+      const t2 = lists.filter(l=>l.tour==='T2').sort((a,b)=>b.pct-a.pct).map(({nuance,tete,pct})=>({nuance,tete,pct}));
+      const eluNuance = lists.find(l => l.elu)?.nuance || null;
+      const entry = { nuance: null, t1: t1.length ? t1 : null, t2: t2.length ? t2 : null };
+      prefillT2FromT1(entry);
+      entry.nuance = resolveWinner(entry.t1, entry.t2, eluNuance);
+      // Secteur ou commune ?
+      const sec = normalizeSectorKey(code);
+      if(sec){
+        RES.marseilleSecteurs[annee][sec] = entry; injected++;
+      } else {
+        const codeClean = /^\d+$/.test(code) && code.length < 5 ? code.padStart(5,'0') : code;
+        RES.communes[annee][codeClean] = entry; injected++;
+      }
+    }
+    showFB(fb, injected>0?'ok':'er', `✓ ${injected} zone(s) importée(s)${skipped?' ('+skipped+' lignes ignorées)':''} — ${filename}`);
+    refreshAll(); renderStats(); renderTable();
+  } catch(e) { showFB(fb,'er','Erreur : '+e.message); }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── Éditeur candidats ────────────────────────────────────────────────────
+let edRef = null;   // {kind:'commune'|'sector', code, nom}
+let edYr  = 2014;
+let edTour = 'T1';
+
+function openEditor(){
+  edRef = null; edYr = 2014; edTour = 'T1';
+  document.getElementById('ed-search').value = '';
+  document.getElementById('ed-sugg').innerHTML = '';
+  document.getElementById('ed-sugg').classList.remove('open');
+  document.getElementById('ed-selected-lbl').textContent = '';
+  document.getElementById('ed-rows').innerHTML = '';
+  document.getElementById('ed-fb').className = 'fb';
+  document.querySelectorAll('.ed-yr-btn').forEach(b => b.classList.toggle('on', b.id==='ed-yr-2014'));
+  document.querySelectorAll('.ed-tour-btn').forEach(b => b.classList.toggle('on', b.id==='ed-tour-T1'));
+  renderEdFilledList();
+  document.getElementById('mod-ed').classList.add('open');
+}
+
+function renderEdFilledList(){
+  const container = document.getElementById('ed-filled-list');
+  if(!container) return;
+  const items = [];
+  // Communes
+  if(geoData) geoData.features.forEach(f => {
+    const code = f.properties.code, nom = f.properties.nom;
+    const years = YEARS.filter(yr => {
+      const e = RES.communes[yr][code];
+      return e && (getNuanceStr(e) || getRich(e));
+    });
+    if(years.length) items.push({kind:'commune', code, nom, years});
+  });
+  // Secteurs
+  Object.entries(SECTOR_LABELS).forEach(([k,lbl]) => {
+    const years = YEARS.filter(yr => {
+      const e = RES.marseilleSecteurs[yr][k];
+      return e && (getNuanceStr(e) || getRich(e));
+    });
+    if(years.length) items.push({kind:'sector', code:k, nom:'Marseille — '+lbl, years});
+  });
+  items.sort((a,b) => a.nom.localeCompare(b.nom,'fr'));
+  if(!items.length){
+    container.innerHTML = '<div style="padding:8px;font-size:9.5px;color:var(--muted);font-style:italic">Aucune donnée saisie.</div>';
+    return;
+  }
+  container.innerHTML = items.map(it => {
+    const dots = it.years.map(yr => {
+      const entry = it.kind==='commune' ? RES.communes[yr][it.code] : RES.marseilleSecteurs[yr][it.code];
+      const nu = getNuanceStr(entry);
+      const col = nu ? NU[nu]?.color||'#888' : '#555';
+      return `<span class="ed-filled-dot" style="background:${col}" title="${yr}${nu?' — '+nu:''}"></span>`;
+    }).join('');
+    const safeRef = JSON.stringify({kind:it.kind,code:it.code,nom:it.nom}).replace(/"/g,'&quot;');
+    return `<div class="ed-filled-item" onclick="edSelectRef(${safeRef})">
+      <span style="flex:1;font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${it.nom}</span>
+      <span class="ed-filled-yr">${it.years.join(' · ')}</span>
+      <div class="ed-filled-dots">${dots}</div>
+    </div>`;
+  }).join('');
+}
+
+function edSearchInput(q){
+  const sugg = document.getElementById('ed-sugg');
+  const v = q.trim().toLowerCase();
+  if(v.length < 1){ sugg.classList.remove('open'); return; }
+  const results = [];
+  // Communes
+  if(geoData) geoData.features.forEach(f => {
+    const nom = f.properties.nom, code = f.properties.code;
+    if(nom.toLowerCase().includes(v)||code.includes(v)) results.push({kind:'commune',code,nom});
+  });
+  // Secteurs
+  Object.entries(SECTOR_LABELS).forEach(([k,lbl]) => {
+    if(lbl.toLowerCase().includes(v)||k.toLowerCase().includes(v)) results.push({kind:'sector',code:k,nom:'Marseille — '+lbl});
+  });
+  results.splice(12);
+  if(!results.length){ sugg.classList.remove('open'); return; }
+  sugg.innerHTML = results.map(r =>
+    `<div class="ed-sugg-item" onclick="edSelectRef(${JSON.stringify(r).replace(/"/g,'&quot;')})">
+      <span>${r.nom}</span><span class="es-code">${r.code}</span>
+    </div>`
+  ).join('');
+  sugg.classList.add('open');
+}
+
+function edSelectRef(ref){
+  edRef = ref;
+  document.getElementById('ed-search').value = ref.nom;
+  document.getElementById('ed-sugg').classList.remove('open');
+  document.getElementById('ed-selected-lbl').textContent = ref.nom + ' — ' + ref.code;
+  edLoadRows();
+}
+
+function setEdYr(yr, el){
+  edYr = yr;
+  document.querySelectorAll('.ed-yr-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  if(edRef) edLoadRows();
+}
+
+function setEdTour(tour, el){
+  edTour = tour;
+  document.querySelectorAll('.ed-tour-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  if(edRef) edLoadRows();
+}
+
+function edGetEntry(){
+  if(!edRef) return null;
+  return edRef.kind === 'commune'
+    ? RES.communes[edYr][edRef.code]
+    : RES.marseilleSecteurs[edYr][edRef.code];
+}
+
+function edLoadRows(){
+  const entry = edGetEntry();
+  const rich = getRich(entry);
+  const lists = rich ? (edTour==='T1' ? rich.t1 : rich.t2) || [] : [];
+  renderEdRows(lists);
+}
+
+function renderEdRows(lists){
+  const container = document.getElementById('ed-rows');
+  container.innerHTML = '';
+  lists.forEach((l,i) => edAppendRow(container, l, i));
+}
+
+function edAppendRow(container, l={}, idx){
+  const row = document.createElement('div');
+  row.className = 'ed-row' + (l.elu ? ' winner' : '');
+  row.dataset.idx = idx ?? container.children.length;
+  // nuance select
+  const nuSel = document.createElement('select');
+  nuSel.className = 'ed-sel';
+  nuSel.innerHTML = Object.entries(NU).map(([k,n]) =>
+    `<option value="${k}" ${k===l.nuance?'selected':''}>${k} — ${n.label.slice(0,18)}</option>`
+  ).join('');
+  nuSel.onchange = () => {
+    const dot = row.querySelector('.ed-nu-dot');
+    if(dot) dot.style.background = NU[nuSel.value]?.color || '#888';
+  };
+  // dot
+  const dot = document.createElement('span');
+  dot.className = 'ed-nu-dot';
+  dot.style.background = NU[l.nuance]?.color || '#888';
+  const nuWrap = document.createElement('div');
+  nuWrap.style.cssText = 'display:flex;align-items:center;gap:3px;';
+  nuWrap.appendChild(dot); nuWrap.appendChild(nuSel);
+  row.appendChild(nuWrap);
+  // tete
+  const inp = document.createElement('input');
+  inp.className = 'ed-inp'; inp.type='text'; inp.placeholder='Tête de liste'; inp.value = l.tete||'';
+  row.appendChild(inp);
+  // pct
+  const pctInp = document.createElement('input');
+  pctInp.className = 'ed-pct'; pctInp.type='number'; pctInp.min=0; pctInp.max=100; pctInp.step=0.01;
+  pctInp.placeholder='0.0'; pctInp.value = l.pct!=null ? l.pct : '';
+  row.appendChild(pctInp);
+  // elu
+  const eluWrap = document.createElement('div');
+  eluWrap.style.cssText='display:flex;justify-content:center';
+  const chk = document.createElement('input');
+  chk.type='checkbox'; chk.className='ed-chk'; chk.checked=!!l.elu;
+  chk.onchange=()=>row.classList.toggle('winner',chk.checked);
+  eluWrap.appendChild(chk); row.appendChild(eluWrap);
+  // del
+  const del = document.createElement('button');
+  del.className='ed-del'; del.textContent='×'; del.onclick=()=>row.remove();
+  row.appendChild(del);
+  container.appendChild(row);
+}
+
+function edAddRow(){
+  const container = document.getElementById('ed-rows');
+  edAppendRow(container, {});
+}
+
+function edCollectRows(){
+  const rows = document.querySelectorAll('#ed-rows .ed-row');
+  return Array.from(rows).map(row => {
+    const [nuWrap, inpEl, pctEl, eluWrap] = row.children;
+    const nuSel = nuWrap.querySelector('select');
+    const inp = inpEl;
+    const pctInp = pctEl;
+    const chk = eluWrap.querySelector('input');
+    return {
+      nuance: nuSel.value,
+      tete: inp.value.trim(),
+      pct: parseFloat(pctInp.value)||0,
+      elu: chk.checked
+    };
+  }).filter(r => r.nuance && NU[r.nuance]);
+}
+
+function edSave(){
+  const fb = document.getElementById('ed-fb');
+  if(!edRef){ showFB(fb,"er","Sélectionnez d'abord une commune ou un secteur."); return; }
+  const lists = edCollectRows();
+  // Récupérer l'entrée existante ou créer
+  const existingEntry = edGetEntry();
+  const existing = getRich(existingEntry) || { nuance: null, t1: null, t2: null };
+  // Remplacer le bon tour
+  const newLists = lists.map(({nuance,tete,pct}) => ({nuance,tete,pct}));
+  const sorted = [...newLists].sort((a,b)=>b.pct-a.pct);
+  const toStoreEd = sorted.map(({nuance,tete,pct,elu}) => elu ? {nuance,tete,pct,elu:true} : {nuance,tete,pct});
+  if(edTour==='T1') existing.t1 = toStoreEd.length ? toStoreEd : null;
+  else              existing.t2 = toStoreEd.length ? toStoreEd : null;
+  // Déterminer le gagnant (T2 prioritaire, puis T1, puis élu coché)
+  const eluRow = lists.find(l=>l.elu);
+  existing.nuance = resolveWinner(existing.t1, existing.t2, eluRow?.nuance||null);
+  // Stocker
+  if(edRef.kind==='commune') RES.communes[edYr][edRef.code] = existing;
+  else RES.marseilleSecteurs[edYr][edRef.code] = existing;
+  showFB(fb,'ok',`✓ Sauvegardé — ${edRef.nom} · ${edYr} ${edTour}`);
+  refreshAll(); renderStats(); renderTable(); renderEdFilledList();
+  // Notification + historique
+  const _entry2 = edRef.kind==='commune' ? RES.communes[edYr][edRef.code] : RES.marseilleSecteurs[edYr][edRef.code];
+  const _n2 = getNuanceStr(_entry2);
+  const _rich2 = getRich(_entry2);
+  const _lists2 = (_rich2?.t2?.some(l=>l.pct>0) ? _rich2.t2 : _rich2?.t1) || [];
+  const _hasReal2 = _lists2.some(l => l.pct > 0) || _lists2.some(l => l.elu);
+  if(_hasReal2 && _lists2.length > 0){
+    const _winner2 = _lists2.find(l=>l.elu||(l.pct>50)) || _lists2[0];
+    histPush([{nom:edRef.nom, code:edRef.code, year:edYr, tour:edTour, nuance:_n2||null, tete:_winner2?.tete||''}]);
+  }
+  ghAutoSync();
+}
+
+function edClear(){
+  if(!edRef) return;
+  const fb = document.getElementById('ed-fb');
+  const entry = edGetEntry();
+  const rich = getRich(entry);
+  if(rich){
+    if(edTour==='T1') rich.t1=null;
+    else rich.t2=null;
+    // Si plus rien, supprimer l'entrée
+    if(!rich.t1 && !rich.t2){
+      if(edRef.kind==='commune') delete RES.communes[edYr][edRef.code];
+      else delete RES.marseilleSecteurs[edYr][edRef.code];
+    }
+  } else if(entry) {
+    if(edRef.kind==='commune') delete RES.communes[edYr][edRef.code];
+    else delete RES.marseilleSecteurs[edYr][edRef.code];
+  }
+  document.getElementById('ed-rows').innerHTML='';
+  showFB(fb,'ok',`Tour ${edTour} effacé.`);
+  refreshAll(); renderStats(); renderTable(); renderEdFilledList();
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── 1. Mode résultats du soir ─────────────────────────────────────
+function toggleSoirMode(){
+  soirMode = !soirMode;
+  const btn = document.getElementById('soir-btn');
+  btn.classList.toggle('soir-on', soirMode);
+  btn.textContent = soirMode ? '🌙 Soir ✓' : '🌙 Soir';
+  refreshAll();
+}
+
+// ── 2. Filtre par bloc ────────────────────────────────────────────
+function buildBlocFilter(){
+  const wrap = document.getElementById('bloc-filter');
+  if(!wrap) return;
+  // Garder le bouton "Tous" existant
+  GRPS.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'bloc-btn';
+    btn.dataset.bloc = g.id;
+    btn.textContent = g.label;
+    // Couleur représentative du bloc (premier NU du groupe)
+    const firstNu = Object.entries(NU).find(([,n]) => n.g === g.id);
+    if(firstNu) btn.style.cssText = `color:${firstNu[1].color};border-color:${firstNu[1].color}33;background:${firstNu[1].color}11`;
+    btn.onclick = () => setBloc(g.id, btn);
+    wrap.appendChild(btn);
+  });
+}
+function setBloc(bloc, el){
+  activeBloc = bloc;
+  document.querySelectorAll('.bloc-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  refreshAll();
+}
+
+// ── 3. Légende interactive (surlignage nuance) ────────────────────
+// Modifie selectNuance pour distinguer "peindre" et "surligner"
+const _origSelectNuance = selectNuance;
+function selectNuance(key){
+  // Double-clic (même nuance déjà sélectionnée) → mode surligneur seul
+  if(selN === key){
+    // Déjà sélectionné pour peindre → basculer surligneur
+    selN = null;
+    highlightN = (highlightN === key) ? null : key;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on','highlight'));
+    if(highlightN){
+      document.getElementById('chip-' + highlightN)?.classList.add('highlight');
+      document.getElementById('hint').textContent = highlightN + ' — surligné. Cliquez encore pour effacer.';
+    } else {
+      document.getElementById('hint').textContent = "Sélectionnez une nuance puis cliquez sur une commune.";
+    }
+    refreshAll();
+    return;
+  }
+  highlightN = null; // annuler surligneur si on sélectionne pour peindre
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on','highlight'));
+  selN = (selN === key) ? null : key;
+  if(selN){
+    document.getElementById('chip-' + selN)?.classList.add('on');
+    document.getElementById('hint').textContent = key + ' — ' + NU[key].label + '. Cliquez sur une zone.';
+  } else {
+    document.getElementById('hint').textContent = "Sélectionnez une nuance puis cliquez sur une commune.";
+  }
+  refreshAll();
+}
+
+// ── 4. Étiquettes communes ────────────────────────────────────────
+function updateLabels(){
+  if(!showLabels){ return; }
+  labelLayers.forEach(({map, layer}) => {
+    const z = map.getZoom();
+    if(z >= 9){
+      if(!map.hasLayer(layer)) layer.addTo(map);
+    } else {
+      if(map.hasLayer(layer)) map.removeLayer(layer);
+    }
+  });
+}
+function toggleLabels(){
+  showLabels = !showLabels;
+  const btn = document.getElementById('label-btn');
+  btn.classList.toggle('on', showLabels);
+  btn.textContent = showLabels ? '𝐴 Étiquettes ✓' : '𝐴 Étiquettes';
+  labelLayers.forEach(({map, layer}) => {
+    if(!showLabels){
+      if(map.hasLayer(layer)) map.removeLayer(layer);
+    }
+  });
+  if(showLabels) updateLabels();
+}
+function buildLabelLayer(map){
+  if(!geoData) return null;
+  const markers = geoData.features.map(f => {
+    const coords = f.geometry;
+    let center;
+    try { center = L.geoJSON(f).getBounds().getCenter(); } catch(e){ return null; }
+    return L.marker(center, {
+      icon: L.divIcon({ className:'commune-label-wrap', html:'<span class="commune-label">'+f.properties.nom+'</span>', iconSize:[0,0], iconAnchor:[0,0] }),
+      interactive: false,
+      zIndexOffset: -1000
+    });
+  }).filter(Boolean);
+  const layer = L.layerGroup(markers);
+  map.on('zoomend', updateLabels);
+  return layer;
+}
+
+// ── 5. Désistements supprimés (pas de bouton D) ─────────────────────
+
+// ── Fusions T1 ────────────────────────────────────────────────────
+function updateFusionBtns(){
+  document.querySelectorAll('#com-cand-rows .cand-row').forEach(row => {
+    const fb = row.querySelector('.fusion-btn');
+    if(!fb) return;
+    const pctEl = row.children[2];
+    const pct = parseFloat(pctEl?.value) || 0;
+    fb.style.display = (comTour === 'T1' && pct >= 5) ? '' : 'none';
+  });
+}
+
+function startFusion(sourceRow, btn, container){
+  // Si déjà fusionné, annuler
+  if(sourceRow._fusedInto){
+    sourceRow._fusedInto = null;
+    sourceRow.classList.remove('fused-in');
+    btn.classList.remove('fused');
+    btn.title = 'Fusionner dans une autre liste';
+    fusionSourceRow = null;
+    clearFusionTargets(container);
+    return;
+  }
+  // Si une autre fusion en cours, l'annuler
+  if(fusionSourceRow && fusionSourceRow !== sourceRow){
+    const prevBtn = fusionSourceRow.querySelector('.fusion-btn');
+    if(prevBtn) prevBtn.classList.remove('active');
+    fusionSourceRow.classList.remove('fusion-source-active');
+    clearFusionTargets(container);
+  }
+  if(fusionSourceRow === sourceRow){
+    fusionSourceRow = null;
+    btn.classList.remove('active');
+    sourceRow.classList.remove('fusion-source-active');
+    clearFusionTargets(container);
+    return;
+  }
+  // Activer mode sélection
+  fusionSourceRow = sourceRow;
+  btn.classList.add('active');
+  sourceRow.classList.add('fusion-source-active');
+  // Overlay sur les lignes cibles (pct >= 10 et non source)
+  container.querySelectorAll('.cand-row').forEach(row => {
+    if(row === sourceRow) return;
+    const pct = parseFloat(row.children[2]?.value) || 0;
+    if(pct >= 10){
+      row.classList.add('fusion-target');
+      // L'overlay ::after capture les clicks via pointer-events
+      row._fusionClickHandler = (e) => { e.stopPropagation(); applyFusion(row, container); };
+      row.addEventListener('click', row._fusionClickHandler, true); // capture phase
+    }
+  });
+}
+
+function applyFusion(targetRow, container){
+  if(!fusionSourceRow) return;
+  const nuWrap = targetRow.children[0];
+  const nuSel = nuWrap.tagName === 'SELECT' ? nuWrap : nuWrap.querySelector('select');
+  const teteInp = targetRow.children[1];
+  fusionSourceRow._fusedInto = {
+    nuance: nuSel?.value || '',
+    tete: teteInp?.value?.trim() || ''
+  };
+  fusionSourceRow.classList.add('fused-in');
+  fusionSourceRow.classList.remove('fusion-source-active');
+  const fb = fusionSourceRow.querySelector('.fusion-btn');
+  if(fb){
+    fb.classList.remove('active');
+    fb.classList.add('fused');
+    fb.title = 'Fusionné dans ' + (fusionSourceRow._fusedInto.tete || fusionSourceRow._fusedInto.nuance) + ' — cliquer pour annuler';
+  }
+  fusionSourceRow = null;
+  clearFusionTargets(container);
+}
+
+function clearFusionTargets(container){
+  container.querySelectorAll('.cand-row.fusion-target').forEach(row => {
+    row.classList.remove('fusion-target');
+    if(row._fusionClickHandler){
+      row.removeEventListener('click', row._fusionClickHandler, true);
+      row._fusionClickHandler = null;
+    }
+  });
+  if(fusionSourceRow) fusionSourceRow.classList.remove('fusion-source-active');
+}
+// ──────────────────────────────────────────────────────────────────
+
+
+
+// ── Notifications & Historique ────────────────────────────────────
+const HIST_KEY = 'bdr_history';
+const HIST_MAX = 100;
+
+function histLoad(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch(_){ return []; } }
+function histSave(arr){ localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0, HIST_MAX))); }
+
+function histPush(entries){
+  // entries = [{nom, code, year, nuance, tete, tour}]
+  if(!entries || !entries.length) return;
+  // Ignorer si aucune entrée n'a de résultat réel (suppression ou aucun changement)
+  entries = entries.filter(e => e.nuance && NU[e.nuance]);
+  if(!entries.length) return;
+  const arr = histLoad();
+  const ts = Date.now();
+  entries.forEach(e => arr.unshift({...e, ts}));
+  histSave(arr);
+  showNotif(entries, ts);
+}
+
+function playBell(){
+  try {
+    const audio = new Audio(getBellPath());
+    audio.volume = 0.7;
+    audio.play().catch(() => {});
+  } catch(_){}
+}
+
+function showNotif(entries, ts, isPoll){
+  // Créer le inner wrapper s'il n'existe pas
+  let panel = document.getElementById('notif-panel-inner');
+  if(!panel){
+    panel = document.createElement('div');
+    panel.id = 'notif-panel-inner';
+    document.body.appendChild(panel);
+  }
+  playBell();
+  const DURATION = isPoll ? 7000 : 6000;
+  const card = document.createElement('div');
+  card.className = 'notif-card';
+  const timeStr = new Date(ts||Date.now()).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const title = isPoll ? '🔔 Mise à jour reçue' : '🔔 Résultats enregistrés';
+  const titleColor = isPoll ? 'var(--ok)' : 'var(--a2)';
+  // Grouper par commune
+  const grouped = {};
+  entries.forEach(e => {
+    const k = e.code + '_' + e.year;
+    if(!grouped[k]) grouped[k] = {nom:e.nom, code:e.code, year:e.year, nuance:e.nuance, items:[]};
+    grouped[k].items.push(e);
+  });
+  const rows = Object.values(grouped);
+  card.innerHTML = `
+    <div class="notif-header">
+      <span class="notif-title" style="color:${titleColor}">${title}</span>
+      <span class="notif-time">${timeStr}</span>
+      <button class="notif-close" onclick="dismissNotif(this.closest('.notif-card'))">×</button>
+    </div>` +
+    rows.slice(0,8).map(r => {
+      const col = r.nuance ? (NU[r.nuance]?.color||'#888') : '#555';
+      const label = r.nuance ? (r.nuance + ' — ' + (NU[r.nuance]?.label||'')) : '⏳ T2 en attente';
+      const tete = r.items.find(i => i.elu || (i.pct && i.pct > 50))?.tete || r.items[0]?.tete || '';
+      return `<div class="notif-item">
+        <span class="notif-dot" style="background:${col}"></span>
+        <div class="notif-body">
+          <div class="notif-nom">${r.nom} <span style="color:var(--muted);font-size:11px;font-weight:400">${r.year}</span></div>
+          <div class="notif-meta">${label}${tete?' · <strong>'+tete+'</strong>':''}</div>
+        </div>
+      </div>`;
+    }).join('') +
+    (rows.length > 8 ? `<div style="font-size:10px;color:var(--muted);padding-top:6px;border-top:1px solid var(--border)">+ ${rows.length-8} autre(s)</div>` : '') +
+    `<div class="notif-progress"><div class="notif-progress-bar" style="animation-duration:${DURATION}ms"></div></div>`;
+  panel.appendChild(card);
+  const timer = setTimeout(() => dismissNotif(card), DURATION);
+  card._timer = timer;
+  // Pause au survol
+  card.addEventListener('mouseenter', () => { clearTimeout(card._timer); card.querySelector('.notif-progress-bar').style.animationPlayState='paused'; });
+  card.addEventListener('mouseleave', () => {
+    card.querySelector('.notif-progress-bar').style.animationPlayState='running';
+    card._timer = setTimeout(() => dismissNotif(card), 2000);
+  });
+}
+
+function dismissNotif(card){
+  if(!card || !card.parentNode) return;
+  clearTimeout(card._timer);
+  card.classList.add('out');
+  setTimeout(() => card.remove(), 320);
+}
+
+function showPollNotif(entries){
+  if(!entries || !entries.length) return;
+  showNotif(entries, Date.now(), true);
+}
+
+function toggleHistory(){
+  document.getElementById('hist-modal').classList.toggle('open');
+  renderHistory();
+}
+
+function renderHistory(){
+  const arr = histLoad();
+  const el = document.getElementById('hist-list');
+  if(!arr.length){
+    el.innerHTML = '<div style="font-size:10px;color:var(--muted);font-style:italic;padding:8px 0">Aucune saisie enregistrée.</div>';
+    return;
+  }
+  // Grouper par timestamp (même enregistrement)
+  const groups = {};
+  arr.forEach(e => {
+    if(!groups[e.ts]) groups[e.ts] = [];
+    groups[e.ts].push(e);
+  });
+  el.innerHTML = Object.entries(groups).sort((a,b) => b[0]-a[0]).map(([ts, items]) => {
+    const timeStr = new Date(Number(ts)).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    return `<div style="margin-bottom:10px">
+      <div style="font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${timeStr}</div>` +
+      items.map(e => {
+        const col = e.nuance ? (NU[e.nuance]?.color||'#888') : '#555';
+        return `<div class="notif-item" style="border-top:1px solid var(--border);padding-top:3px">
+          <span class="notif-dot" style="background:${col}"></span>
+          <div class="notif-body">
+            <div class="notif-nom">${e.nom} <span style="color:var(--muted);font-weight:400">${e.year} ${e.tour||''}</span></div>
+            <div class="notif-meta">${e.nuance ? e.nuance+' — '+(NU[e.nuance]?.label||'') : '⏳ T2 en attente'}${e.tete?' · '+e.tete:''}</div>
+          </div>
+        </div>`;
+      }).join('') +
+    '</div>';
+  }).join('<div style="border-top:1px solid var(--border);margin:4px 0"></div>');
+}
+
+function clearHistory(){
+  if(!confirm('Effacer tout l\'historique ?')) return;
+  localStorage.removeItem(HIST_KEY);
+  renderHistory();
+}
+// ──────────────────────────────────────────────────────────────────
+
+// ── Live polling ──────────────────────────────────────────────────
+let _pollTimer = null;
+let _lastSha   = null;   // SHA du JSON sur GitHub au dernier check
+let _pollPaused = false; // pause quand on est en train d'éditer
+
+function ghStartPolling(){
+  ghStopPolling();
+  const cfg = ghGetConfig();
+  if(!cfg.poll || !cfg.token || !cfg.owner || !cfg.repo) return;
+  const interval = (cfg.pollInterval || 30) * 1000;
+  document.getElementById('live-indicator').classList.add('on');
+  _pollTimer = setInterval(ghPollCheck, interval);
+  ghPollCheck(); // check immédiat
+}
+
+function ghStopPolling(){
+  if(_pollTimer){ clearInterval(_pollTimer); _pollTimer = null; }
+  document.getElementById('live-indicator').classList.remove('on');
+}
+
+async function ghPollCheck(){
+  if(_pollPaused) return;
+  const cfg = ghGetConfig();
+  if(!cfg.token || !cfg.owner || !cfg.repo) return;
+  const dot = document.getElementById('live-dot');
+  const txt = document.getElementById('live-txt');
+  try {
+    const apiBase = 'https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/contents/' + cfg.path;
+    const headers = {
+      'Authorization': 'Bearer ' + cfg.token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    const res = await fetch(apiBase + '?ref=' + cfg.branch, {headers});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const sha = data.sha;
+    if(_lastSha === null){
+      // Premier check : initialiser le SHA sans recharger
+      _lastSha = sha;
+      dot.classList.remove('stale');
+      txt.textContent = 'live';
+      return;
+    }
+    if(sha !== _lastSha){
+      // Nouvelles données disponibles
+      _lastSha = sha;
+      dot.classList.add('stale');
+      txt.textContent = 'màj…';
+      // Snapshot avant pour détecter les nouveautés
+      const _snapBefore = JSON.parse(JSON.stringify(RES));
+      const content = JSON.parse(decodeURIComponent(escape(atob(data.content.replace(/\n/g,'')))));
+      applyLoadedData(content);
+      buildPalette(); syncYearBtns(); buildMaps(); refreshAll(); renderStats(); renderTable();
+      // Détecter les entrées nouvelles/modifiées et notifier
+      const _newEntries = [];
+      YEARS.forEach(yr => {
+        Object.entries(RES.communes[yr]).forEach(([code, entry]) => {
+          const prev = _snapBefore.communes[yr][code];
+          const prevN = prev ? (typeof prev==='string'?prev:prev?.nuance) : null;
+          const curN = getNuanceStr(entry);
+          if(curN && curN !== prevN && geoData){
+            const feat = geoData.features.find(f => f.properties.code===code);
+            const nom = feat?.properties?.nom || code;
+            const rich = getRich(entry);
+            const winner = rich?.t2?.find(l=>l.elu) || rich?.t2?.[0] || rich?.t1?.find(l=>l.elu) || rich?.t1?.[0];
+            _newEntries.push({nom, code, year:yr, nuance:curN, tete:winner?.tete||''});
+          }
+        });
+      });
+      if(_newEntries.length) showPollNotif(_newEntries);
+      dot.classList.remove('stale');
+      txt.textContent = 'live ✓';
+      setTimeout(() => { txt.textContent = 'live'; }, 3000);
+    }
+  } catch(e){
+    dot.classList.add('stale');
+    txt.textContent = 'erreur';
+    console.warn('Poll error:', e.message);
+  }
+}
+
+// Pause polling quand un modal est ouvert (éviter rechargement pendant saisie)
+function ghPausePoll(){ _pollPaused = true; }
+function ghResumePoll(){ _pollPaused = false; }
+// ──────────────────────────────────────────────────────────────────
+
+
+function injectHatchPatternIntoMap(map){
+  // Trouver le SVG Leaflet de cette carte et y injecter les defs
+  const container = map.getContainer();
+  const svgEl = container.querySelector('svg.leaflet-zoom-animated, svg');
+  if(!svgEl) return;
+  if(svgEl.querySelector('#lf-hatch-dark')) return; // déjà injecté
+  const ns = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(ns, 'defs');
+  const mkPat = (id, stroke) => {
+    const pat = document.createElementNS(ns, 'pattern');
+    pat.setAttribute('id', id);
+    pat.setAttribute('patternUnits', 'userSpaceOnUse');
+    pat.setAttribute('width', '8'); pat.setAttribute('height', '8');
+    pat.setAttribute('patternTransform', 'rotate(45)');
+    const line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1','0'); line.setAttribute('y1','0');
+    line.setAttribute('x2','0'); line.setAttribute('y2','8');
+    line.setAttribute('stroke', stroke); line.setAttribute('stroke-width','3');
+    pat.appendChild(line); return pat;
+  };
+  defs.appendChild(mkPat('lf-hatch-dark',  'rgba(255,255,255,0.22)'));
+  defs.appendChild(mkPat('lf-hatch-light', 'rgba(0,0,0,0.18)'));
+  svgEl.insertBefore(defs, svgEl.firstChild);
+}
+
+// ── GitHub Sync ───────────────────────────────────────────────────
+const GH_LS_KEY = 'bdr_gh_config';
+
+function ghGetConfig(){
+  try { return JSON.parse(localStorage.getItem(GH_LS_KEY)||'{}'); } catch(_){ return {}; }
+}
+
+const BELL_PATH_KEY = 'bdr_bell_path';
+function getBellPath(){ return localStorage.getItem(BELL_PATH_KEY) || './cloche.mp3'; }
+
+function openGhConfig(){
+  const cfg = ghGetConfig();
+  document.getElementById('gh-token').value  = cfg.token  || '';
+  document.getElementById('gh-owner').value  = cfg.owner  || '';
+  document.getElementById('gh-repo').value   = cfg.repo   || '';
+  document.getElementById('gh-path').value   = cfg.path   || 'carte_bdr.json';
+  document.getElementById('gh-branch').value = cfg.branch || 'main';
+  document.getElementById('gh-auto').checked = !!(cfg.auto);
+  document.getElementById('gh-poll').checked = !!(cfg.poll);
+  document.getElementById('gh-poll-interval').value = cfg.pollInterval || 30;
+  document.getElementById('gh-poll-interval-row').style.display = cfg.poll ? 'flex' : 'none';
+  document.getElementById('gh-bell').value = getBellPath();
+  document.getElementById('gh-config-status').className = 'gh-status';
+  document.getElementById('mod-gh').classList.add('open');
+}
+
+function ghSaveConfig(){
+  // Nettoyer les slashes — le champ repo ne doit contenir que le nom du dépôt
+  let owner = document.getElementById('gh-owner').value.trim().replace(/\/+$/, '');
+  let repo  = document.getElementById('gh-repo').value.trim().replace(/\/+$/, '');
+  // Si l'utilisateur a mis "owner/repo" dans le champ repo, corriger automatiquement
+  if(repo.includes('/') && !owner){
+    const parts = repo.split('/');
+    owner = parts[0]; repo = parts.slice(1).join('/');
+  } else if(repo.includes('/')){
+    ghShowStatus('gh-config-status', 'er',
+      'Le champ "Dépôt" ne doit contenir que le nom du dépôt, sans le propriétaire ni de slash.\nEx : "Municipales-2026"');
+    document.getElementById('gh-repo').style.borderColor = 'var(--err)';
+    return;
+  }
+  document.getElementById('gh-repo').style.borderColor = '';
+  const cfg = {
+    token:  document.getElementById('gh-token').value.trim(),
+    owner,
+    repo,
+    path:   document.getElementById('gh-path').value.trim() || 'carte_bdr.json',
+    branch: document.getElementById('gh-branch').value.trim() || 'main',
+    auto:   document.getElementById('gh-auto').checked,
+    poll:   document.getElementById('gh-poll').checked,
+    pollInterval: parseInt(document.getElementById('gh-poll-interval').value)||30
+  };
+  localStorage.setItem(BELL_PATH_KEY, document.getElementById('gh-bell').value.trim() || './cloche.mp3');
+  if(!cfg.token || !cfg.owner || !cfg.repo){
+    ghShowStatus('gh-config-status', 'er', 'Token, propriétaire et dépôt sont obligatoires.');
+    return;
+  }
+  localStorage.setItem(GH_LS_KEY, JSON.stringify(cfg));
+  const apiUrl = 'https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/contents/' + cfg.path;
+  ghShowStatus('gh-config-status', 'ok', '✓ Configuration enregistrée.\nURL : ' + apiUrl + '\nCliquez sur ⟳ GitHub pour tester.');
+  updateGhBtn();
+  // Démarrer ou arrêter le polling selon le choix
+  if(cfg.poll) ghStartPolling(); else ghStopPolling();
+}
+
+function ghClearConfig(){
+  localStorage.removeItem(GH_LS_KEY);
+  ['gh-token','gh-owner','gh-repo','gh-path','gh-branch'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('gh-auto').checked = false;
+  ghShowStatus('gh-config-status', 'ok', 'Configuration effacée.');
+  updateGhBtn();
+}
+
+function updateGhBtn(){
+  const cfg = ghGetConfig();
+  const btn = document.getElementById('gh-sync-btn');
+  if(btn) btn.style.color = (cfg.token && cfg.owner && cfg.repo) ? 'var(--ok)' : '';
+}
+
+function ghShowStatus(elId, type, msg){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  el.className = 'gh-status ' + type;
+  el.textContent = msg;
+}
+
+async function ghSync(silent=false){
+  const cfg = ghGetConfig();
+  if(!cfg.token || !cfg.owner || !cfg.repo){
+    if(!silent) openGhConfig();
+    return;
+  }
+  const btn = document.getElementById('gh-sync-btn');
+  if(btn){ btn.classList.add('syncing'); btn.disabled = true; }
+  const statusEl = document.getElementById('gh-config-status');
+  ghShowStatus('gh-config-status', 'loading', '⟳ Connexion à GitHub…');
+  try {
+    // Encoder le JSON en base64 UTF-8 compatible GitHub
+    const json = JSON.stringify(buildExportObject(), null, 2);
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(json);
+    let binary = '';
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    const content = btoa(binary);
+
+    // Nettoyage du chemin (pas de / au début)
+    const filePath = (cfg.path || 'carte_bdr.json').replace(/^\//, '');
+    const apiBase = 'https://api.github.com/repos/' + cfg.owner.trim() + '/' + cfg.repo.trim() + '/contents/' + filePath;
+    const headers = {
+      'Authorization': 'token ' + cfg.token.trim(),
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v3+json'
+    };
+
+    // Étape 1 : récupérer le SHA actuel du fichier
+    ghShowStatus('gh-config-status', 'loading', '⟳ Lecture du fichier existant…');
+    let sha = null;
+    const getRes = await fetch(apiBase + '?ref=' + (cfg.branch||'main'), {headers});
+    if(getRes.ok){
+      const d = await getRes.json();
+      sha = d.sha;
+    } else if(getRes.status === 401){
+      ghShowStatus('gh-config-status', 'er', '✗ Token invalide ou expiré (401). Vérifie tes permissions dans GitHub → Developer settings.');
+      return;
+    } else if(getRes.status === 404){
+      // Fichier n'existe pas encore → on va le créer
+      sha = null;
+    } else {
+      const errTxt = await getRes.text();
+      ghShowStatus('gh-config-status', 'er', '✗ Erreur lecture ' + getRes.status + ' : ' + errTxt.slice(0,120));
+      return;
+    }
+
+    // Étape 2 : pousser le fichier
+    ghShowStatus('gh-config-status', 'loading', '⟳ Envoi des données…');
+    const body = {
+      message: 'carte-bdr: maj ' + new Date().toISOString().slice(0,16).replace('T',' '),
+      content,
+      branch: cfg.branch || 'main'
+    };
+    if(sha) body.sha = sha;
+
+    const putRes = await fetch(apiBase, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if(putRes.ok){
+      const now = new Date().toLocaleTimeString('fr-FR');
+      ghShowStatus('gh-config-status', 'ok', '✓ Synchronisé à ' + now);
+      if(btn) btn.title = 'Dernière synchro : ' + now;
+      if(btn) btn.style.color = 'var(--ok)';
+    } else {
+      const errData = await putRes.json().catch(() => ({}));
+      const msg = errData.message || '';
+      const detail = errData.errors ? JSON.stringify(errData.errors) : '';
+      ghShowStatus('gh-config-status', 'er', '✗ Erreur ' + putRes.status + ' : ' + msg + (detail?' — '+detail:''));
+    }
+  } catch(e){
+    ghShowStatus('gh-config-status', 'er', '✗ Erreur réseau : ' + e.message);
+  } finally {
+    if(btn){ btn.classList.remove('syncing'); btn.disabled = false; }
+  }
+}
+
+// Test de connexion (lecture seule)
+async function ghTest(){
+  const cfg = ghGetConfig();
+  if(!cfg.token || !cfg.owner || !cfg.repo){
+    ghShowStatus('gh-config-status','er','Remplis d\'abord token, propriétaire et dépôt.');
+    return;
+  }
+  ghShowStatus('gh-config-status','loading','⟳ Test de connexion…');
+  try {
+    const res = await fetch('https://api.github.com/repos/' + cfg.owner.trim() + '/' + cfg.repo.trim(), {
+      headers: { 'Authorization': 'token ' + cfg.token.trim(), 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if(res.ok){
+      const d = await res.json();
+      ghShowStatus('gh-config-status','ok','✓ Dépôt trouvé : ' + d.full_name + (d.private?' (privé)':' (public)'));
+    } else if(res.status === 401){
+      ghShowStatus('gh-config-status','er','✗ Token invalide (401). Vérifie dans GitHub → Settings → Developer settings.');
+    } else if(res.status === 404){
+      ghShowStatus('gh-config-status','er','✗ Dépôt introuvable (404). Vérifie owner/"' + cfg.owner + '" et repo/"' + cfg.repo + '".');
+    } else {
+      ghShowStatus('gh-config-status','er','✗ Erreur ' + res.status);
+    }
+  } catch(e){
+    ghShowStatus('gh-config-status','er','✗ Erreur réseau : ' + e.message);
+  }
+}
+
+// ── File d'attente avec debounce ─────────────────────────────────
+let _syncTimer   = null;   // timer debounce
+let _syncPending = false;  // un push est en cours
+let _syncQueued  = false;  // une demande est en attente du push en cours
+const SYNC_DEBOUNCE = 60000; // ms — 1 minute
+
+function ghAutoSync(){
+  const cfg = ghGetConfig();
+  if(!cfg.auto || !cfg.token || !cfg.owner || !cfg.repo) return;
+  // Si un push est en cours, marquer comme en attente
+  if(_syncPending){ _syncQueued = true; return; }
+  // Debounce : annuler le timer précédent et redémarrer
+  clearTimeout(_syncTimer);
+  _syncTimer = setTimeout(() => { ghSyncNow(true); }, SYNC_DEBOUNCE);
+  // Indicateur d'attente
+  const btn = document.getElementById('gh-sync-btn');
+  if(btn) btn.style.opacity = '0.6';
+  // Alerte : synchro programmée dans 1 min
+  const _sa0 = document.getElementById('sync-alert');
+  if(_sa0){
+    document.getElementById('sync-alert-txt').textContent = '⏸ Modifications en attente — synchronisation dans 1 min';
+    _sa0.classList.add('visible');
+    _sa0.style.background = 'var(--border2)';
+    _sa0.style.color = 'var(--text)';
+  }
+}
+
+async function ghSyncNow(silent=false){
+  const cfg = ghGetConfig();
+  if(!cfg.token || !cfg.owner || !cfg.repo){
+    if(!silent) openGhConfig();
+    return;
+  }
+  _syncPending = true;
+  const btn = document.getElementById('gh-sync-btn');
+  if(btn){ btn.classList.add('syncing'); btn.disabled=true; btn.style.opacity='1'; }
+  // Afficher l'alerte (mode push en cours)
+  const _sa = document.getElementById('sync-alert');
+  if(_sa){
+    document.getElementById('sync-alert-txt').textContent = '⏳ Synchronisation en cours — évitez de modifier jusqu\'à la fin';
+    _sa.style.background = 'var(--gold)';
+    _sa.style.color = '#000';
+    _sa.classList.add('visible');
+  }
+  try {
+    const json = JSON.stringify(buildExportObject(), null, 2);
+    const content = btoa(unescape(encodeURIComponent(json)));
+    const apiBase = 'https://api.github.com/repos/' + cfg.owner + '/' + cfg.repo + '/contents/' + cfg.path;
+    const headers = {
+      'Authorization': 'Bearer ' + cfg.token,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28'
+    };
+    // Toujours récupérer le SHA frais juste avant de pousser
+    let sha = null;
+    try {
+      const getRes = await fetch(apiBase + '?ref=' + cfg.branch, {headers, cache:'no-store'});
+      if(getRes.ok){ const d = await getRes.json(); sha = d.sha; _lastSha = sha; }
+    } catch(_){}
+    const body = {
+      message: 'carte-bdr: maj ' + new Date().toISOString().slice(0,16).replace('T',' '),
+      content, branch: cfg.branch
+    };
+    if(sha) body.sha = sha;
+    const putRes = await fetch(apiBase, { method:'PUT', headers, body:JSON.stringify(body) });
+    if(putRes.ok){
+      const d = await putRes.json();
+      // Mettre à jour le SHA connu pour éviter un faux positif du polling
+      if(d.content?.sha) _lastSha = d.content.sha;
+      ghShowStatus('gh-config-status', 'ok', '✓ Synchronisé le ' + new Date().toLocaleTimeString('fr-FR'));
+      if(btn) btn.title = 'Dernière synchro : ' + new Date().toLocaleTimeString('fr-FR');
+    } else {
+      const err = await putRes.json().catch(()=>({}));
+      const msg = 'Erreur GitHub ' + putRes.status + ' : ' + (err.message||'');
+      ghShowStatus('gh-config-status', 'er', msg);
+      if(!silent) console.warn(msg);
+    }
+  } catch(e){
+    if(!silent) console.warn('Sync error:', e.message);
+  } finally {
+    _syncPending = false;
+    if(btn){ btn.classList.remove('syncing'); btn.disabled=false; }
+    // Masquer l'alerte
+    const _sa2 = document.getElementById('sync-alert');
+    if(_sa2) _sa2.classList.remove('visible');
+    // S'il y avait une demande en attente, la traiter maintenant
+    if(_syncQueued){
+      _syncQueued = false;
+      setTimeout(() => ghSyncNow(true), 300);
+    }
+  }
+}
+// ──────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('th-ico').textContent = isDark ? '☀' : '🌙';
+  document.getElementById('th-txt').textContent = isDark ? 'Mode clair' : 'Mode sombre';
+  refreshAll();
+  maps.forEach(m => m.map.invalidateSize());
+}
+function toggleSidebar() {
+  sbOpen = !sbOpen;
+  const sb = document.getElementById('sidebar');
+  const tab = document.getElementById('sb-tab');
+  if (sbOpen) { sb.style.width='320px'; sb.style.minWidth='320px'; tab.style.left='320px'; tab.innerHTML='&#8249;'; }
+  else { sb.style.width='0'; sb.style.minWidth='0'; tab.style.left='0'; tab.innerHTML='&#8250;'; }
+  setTimeout(() => maps.forEach(m => m.map.invalidateSize()), 240);
+}
+function toggleYear(yr, btn){
+  const idx = visibleYears.indexOf(yr);
+  if(idx >= 0){
+    if(visibleYears.length === 1){ return; } // au moins une carte
+    visibleYears = visibleYears.filter(y => y !== yr);
+  } else {
+    visibleYears = [...visibleYears, yr].sort((a,b) => a-b);
+  }
+  curStatYear = visibleYears[0];
+  syncYearBtns();
+  buildMaps();
+  renderStats();
+}
+function syncYearBtns(){
+  YEARS.forEach(yr => {
+    const btn = document.getElementById('yr-btn-' + yr);
+    if(btn) btn.classList.toggle('yr-on', visibleYears.includes(yr));
+  });
+}
+function toggleViewMode(){
+  viewMode = viewMode === 'dept' ? 'marseille' : 'dept';
+  const btn = document.getElementById('marseille-tab-btn');
+  if(viewMode === 'marseille'){
+    btn.classList.add('msmode');
+    btn.textContent = '🏙 Marseille — Secteurs ✓';
+  } else {
+    btn.classList.remove('msmode');
+    btn.textContent = '🏙 Marseille — Secteurs';
+  }
+  buildMaps();
+  renderStats();
+  renderTable();
+}
+
+
+function buildMaps(){
+  const area = document.getElementById('map-area');
+  area.innerHTML = '';
+  maps.forEach(m => { try { m.map.remove(); } catch(e){} });
+  maps = [];
+  labelLayers = [];
+
+  if(viewMode === 'marseille'){
+    buildMapsMarseilleMode();
+  } else {
+    buildMapsDeptMode();
+  }
+  setTimeout(() => maps.forEach(m => m.map.invalidateSize()), 50);
+}
+
+function buildMapsDeptMode(){
+  const area = document.getElementById('map-area');
+  const deptBounds = L.geoJSON(geoData).getBounds();
+  visibleYears.forEach(yr => {
+    const box = document.createElement('div');
+    box.className = 'mc';
+    box.innerHTML = `<div class="map-lbl">${yr}</div><div class="lf-map" id="map-${yr}"></div>`;
+    area.appendChild(box);
+
+    const map = L.map(`map-${yr}`, {zoomControl:true, attributionControl:false});
+    const communeLayer = L.geoJSON(geoData, {
+      style:f => featureStyleCommune(f, yr),
+      onEachFeature:(f, layer) => bindCommuneFeature(f, layer, yr)
+    }).addTo(map);
+    map.fitBounds(deptBounds, {padding:[18,18]});
+    map.on('moveend', () => syncMaps(map));
+    maps.push({year:yr, map, communeLayer, marseilleLayer:null, mode:'dept'});
+    map.on('layeradd', () => { setTimeout(()=>injectHatchPatternIntoMap(map),100); });
+    injectHatchPatternIntoMap(map);
+    const lbl = buildLabelLayer(map);
+    if(lbl) labelLayers.push({map, layer:lbl});
+  });
+}
+
+function buildMapsMarseilleMode(){
+  // Rebuild sector data if empty (e.g. AMP API failed on load)
+  if(!marseilleSectorData?.features?.length) {
+    marseilleSectorData = buildSectorDataFromArrondissements();
+  }
+  const area = document.getElementById('map-area');
+  // Compute Marseille bounds from sector data or fallback
+  let marseilleBounds;
+  if(marseilleSectorData?.features?.length){
+    marseilleBounds = L.geoJSON(marseilleSectorData).getBounds();
+  } else {
+    // Fallback: filter 13055 from commune data
+    const mFeature = geoData.features.find(f => f.properties.code === '13055');
+    marseilleBounds = mFeature ? L.geoJSON(mFeature).getBounds() : L.geoJSON(geoData).getBounds();
+  }
+
+  visibleYears.forEach(yr => {
+    const box = document.createElement('div');
+    box.className = 'mc';
+    box.innerHTML = `<div class="map-lbl" style="color:#c084fc">Marseille ${yr}</div><div class="lf-map" id="map-mrs-${yr}"></div>`;
+    area.appendChild(box);
+
+    const map = L.map(`map-mrs-${yr}`, {zoomControl:true, attributionControl:false});
+    let marseilleLayer = null;
+    if(marseilleSectorData?.features?.length){
+      marseilleLayer = L.geoJSON(marseilleSectorData, {
+        style:f => featureStyleMarseilleSectorDedicated(f, yr),
+        onEachFeature:(f, layer) => bindMarseilleSectorFeature(f, layer, yr)
+      }).addTo(map);
+    }
+    map.fitBounds(marseilleBounds, {padding:[24,24]});
+    map.on('moveend', () => syncMaps(map));
+    maps.push({year:yr, map, communeLayer:null, marseilleLayer, mode:'marseille'});
+  });
+}
+
+let syncFlag = false;
+function syncMaps(origin){
+  if(syncFlag) return;
+  syncFlag = true;
+  const c = origin.getCenter(), z = origin.getZoom();
+  maps.forEach(m => { if(m.map !== origin) m.map.setView(c, z, {animate:false}); });
+  syncFlag = false;
+}
+
+function isPendingT2(entry){
+  if(!entry || typeof entry !== 'object') return false;
+  const rich = getRich(entry);
+  if(!rich) return false;
+  // T2 pré-rempli (tous % à 0) et pas de gagnant = en attente
+  return !!(rich.t2 && rich.t2.length && !rich.t2.some(l=>l.pct>0) && !rich.nuance);
+}
+function isBlocMatch(nuance){
+  if(!activeBloc) return true;
+  return NU[nuance]?.g === activeBloc;
+}
+function featureStyleCommune(f, yr){
+  const code = f.properties.code;
+  const lt = !isDark;
+  const entry = RES.communes[yr][code];
+  const n = getNuanceStr(entry);
+  const chg = yr === 2026 && deltaVs2020Commune(code);
+  // Filtre bloc
+  const blocOk = !n || isBlocMatch(n);
+  // Mode soir : griser les communes en attente T2
+  const pending = soirMode && isPendingT2(entry);
+  // Légende interactive : atténuer si autre nuance surlignée
+  const dimmed = highlightN && n !== highlightN;
+  const fillAlpha = pending ? .15 : (dimmed ? .12 : (n ? .88 : .42));
+  const fillC = (!blocOk || dimmed) ? (lt ? '#c5d5e5' : '#1a3248') : (n && NU[n] ? NU[n].color : (lt ? '#c5d5e5' : '#1a3248'));
+  return {
+    fillColor: fillC,
+    weight: chg && blocOk && !dimmed ? 1.8 : 1,
+    color: chg && blocOk && !dimmed ? '#f59e0b' : (lt ? '#9ab0cc' : '#0e1e30'),
+    fillOpacity: fillAlpha,
+    className: (pending && !soirMode) ? 'pending-hatch' : ''
+  };
+}
+function featureStyleMarseilleSector(f, yr){
+  // Legacy — kept for refreshAll compatibility, returns invisible
+  return {fillColor:'transparent', fillOpacity:0, opacity:0, weight:0};
+}
+function featureStyleMarseilleSectorDedicated(f, yr){
+  const sector = String(f.properties._sector || '');
+  const entry = sector ? RES.marseilleSecteurs[yr][sector] : null;
+  const nu = getNuanceStr(entry);
+  const sChg = yr === 2026 && sector ? deltaVs2020Sector(sector) : false;
+  const pending = soirMode && isPendingT2(entry);
+  const dimmed = highlightN && nu !== highlightN;
+  const blocOk = !nu || isBlocMatch(nu);
+  const fillC = (!blocOk || dimmed) ? (!isDark ? '#c5d5e5' : '#1a3248') : (nu && NU[nu] ? NU[nu].color : (!isDark ? '#c5d5e5' : '#1a3248'));
+  return {
+    fillColor: fillC,
+    weight: sChg && blocOk && !dimmed ? 2.2 : 1.2,
+    color: sChg && blocOk && !dimmed ? '#f59e0b' : (!isDark ? '#8090a0' : '#4a6a8a'),
+    fillOpacity: pending ? .1 : (dimmed || !blocOk ? .1 : (nu ? 0.9 : 0.28)), opacity:1,
+    className: (pending && !soirMode) ? 'pending-hatch' : ''
+  };
+}
+function bindCommuneFeature(f, layer, yr){
+  const code = f.properties.code, nom = f.properties.nom;
+  layer.bindTooltip(() => makeTooltipCommune(code, nom, yr), {className:'c-tt', sticky:true, opacity:1});
+  layer.on('mouseover', function(){ this.setStyle({weight:2.5, color:'#60a5fa', fillOpacity:.95}); this.bringToFront(); });
+  layer.on('mouseout', function(){ this.setStyle(featureStyleCommune(f, yr)); });
+  layer.on('click', () => {
+    if(selN) { RES.communes[yr][code] = selN; refreshAll(); renderStats(); renderTable(); }
+    else openModal({kind:'commune', code, nom});
+  });
+}
+function bindMarseilleSectorFeature(f, layer, yr){
+  const sector = String(f.properties._sector || '');
+  const label = f.properties._label || SECTOR_LABELS[sector] || sector;
+  layer.bindTooltip(() => makeTooltipMarseille(sector, label, yr), {className:'c-tt', sticky:true, opacity:1});
+  layer.on('add', function(){ if(this._path) this._path.style.pointerEvents = ''; });
+  layer.on('mouseover', function(){
+    this.setStyle({weight:2.5, color:'#a78bfa', fillOpacity:.95});
+    this.bringToFront();
+  });
+  layer.on('mouseout', function(){ this.setStyle(featureStyleMarseilleSectorDedicated(f, yr)); });
+  layer.on('click', () => {
+    if(!sector) return;
+    if(selN) { RES.marseilleSecteurs[yr][sector] = selN; refreshAll(); renderStats(); renderTable(); }
+    else openModal({kind:'sector', code:sector, nom:SECTOR_LABELS[sector] || label});
+  });
+}
+function comboDelta(code){
+  const vals = YEARS.map(y => getNuanceStr(RES.communes[y][code])).filter(Boolean);
+  return new Set(vals).size > 1;
+}
+function comboDeltaSector(code){
+  const vals = YEARS.map(y => getNuanceStr(RES.marseilleSecteurs[y][code])).filter(Boolean);
+  return new Set(vals).size > 1;
+}
+function getWinnerTete(entry){
+  // Récupère le nom de la tête de liste gagnante depuis l'entrée riche
+  const rich = getRich(entry);
+  if(!rich) return null;
+  const winList = (rich.t2?.some(l=>l.pct>0) ? rich.t2 : rich.t1) || [];
+  const winner = winList.find(l=>l.elu) || winList[0];
+  return winner?.tete?.trim().toLowerCase() || null;
+}
+function deltaVs2020Commune(code){
+  const n2020 = getNuanceStr(RES.communes[2020][code]);
+  const n2026 = getNuanceStr(RES.communes[2026][code]);
+  if(!(n2020 && n2026 && n2020 !== n2026)) return false;
+  // Même tête de liste → pas d'alternance
+  const t2020 = getWinnerTete(RES.communes[2020][code]);
+  const t2026 = getWinnerTete(RES.communes[2026][code]);
+  if(t2020 && t2026 && t2020 === t2026) return false;
+  return true;
+}
+function deltaVs2020Sector(sector){
+  const n2020 = getNuanceStr(RES.marseilleSecteurs[2020][sector]);
+  const n2026 = getNuanceStr(RES.marseilleSecteurs[2026][sector]);
+  if(!(n2020 && n2026 && n2020 !== n2026)) return false;
+  const t2020 = getWinnerTete(RES.marseilleSecteurs[2020][sector]);
+  const t2026 = getWinnerTete(RES.marseilleSecteurs[2026][sector]);
+  if(t2020 && t2026 && t2020 === t2026) return false;
+  return true;
+}
+function refreshAll(){
+  maps.forEach(m => {
+    if(m.mode === 'marseille'){
+      m.marseilleLayer && m.marseilleLayer.setStyle(f => featureStyleMarseilleSectorDedicated(f, m.year));
+    } else {
+      m.communeLayer && m.communeLayer.setStyle(f => featureStyleCommune(f, m.year));
+    }
+    // Appliquer le pattern SVG aux paths pending (après que setStyle ait mis la className)
+    setTimeout(() => applyHatchToMap(m), 50);
+  });
+}
+
+function applyHatchToMap(m){
+  injectHatchPatternIntoMap(m.map);
+  const lt = !isDark;
+  const patId = lt ? 'lf-hatch-light' : 'lf-hatch-dark';
+  const container = m.map.getContainer();
+  container.querySelectorAll('.pending-hatch').forEach(path => {
+    path.style.fill = 'url(#' + patId + ')';
+    path.style.fillOpacity = '1';
+  });
+  container.querySelectorAll('.leaflet-interactive:not(.pending-hatch)').forEach(path => {
+    if(path.style.fill && path.style.fill.startsWith('url')) path.style.fill = '';
+  });
+}
+
+function buildPalette(){
+  const el = document.getElementById('palette');
+  el.innerHTML = '';
+  GRPS.forEach(grp => {
+    Object.entries(NU).filter(([,n]) => n.g === grp.id).forEach(([key, n]) => {
+      const c = document.createElement('div');
+      c.className = 'chip'; c.id = 'chip-' + key;
+      c.innerHTML = `<span class="ndot" style="background:${n.color}"></span>${key}`;
+      c.title = n.label; c.onclick = () => selectNuance(key); el.appendChild(c);
+    });
+  });
+}
+function selectNuance(key){
+  selN = (selN === key) ? null : key;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  if (selN) {
+    document.getElementById('chip-' + selN)?.classList.add('on');
+    document.getElementById('hint').textContent = key + ' — ' + NU[key].label + '. Cliquez sur une zone.';
+  } else {
+    document.getElementById('hint').textContent = 'Sélectionnez une nuance puis cliquez sur une commune ou un secteur de Marseille.';
+  }
+}
+
+// ── Variables modal commune ──────────────────────────────────────
+let comMode = 'cands';   // 'cands' | 'nuance'
+let comTour = 'T1';
+
+function openModal(ref){ ghPausePoll();
+  modRef = ref;
+  modYear = visibleYears[0];
+  comMode = 'cands';
+  comTour = 'T1';
+  document.getElementById('m-title').textContent = ref.nom;
+  document.getElementById('m-sub').textContent = ref.kind === 'commune'
+    ? 'Code INSEE : ' + ref.code : 'Marseille — ' + ref.code;
+  // Reset tabs
+  document.getElementById('com-tab-cands').classList.add('on');
+  document.getElementById('com-tab-nuance').classList.remove('on');
+  document.getElementById('com-mode-cands').classList.add('active');
+  document.getElementById('com-mode-nuance').classList.remove('active');
+  document.getElementById('com-cand-fb').className = 'fb';
+  document.getElementById('com-save-btn').style.display = '';
+  // Réinitialiser les boutons tour T1/T2
+  document.getElementById('com-tour-T1').classList.add('on');
+  document.getElementById('com-tour-T2').classList.remove('on');
+  setModYear(modYear);
+  document.getElementById('mod-com').classList.add('open');
+}
+
+function setComMode(mode, el){
+  comMode = mode;
+  document.querySelectorAll('.com-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('com-mode-cands').classList.toggle('active', mode==='cands');
+  document.getElementById('com-mode-nuance').classList.toggle('active', mode==='nuance');
+  document.getElementById('com-save-btn').style.display = mode==='cands' ? '' : 'none';
+  if(mode==='nuance') setModYear(modYear);
+}
+
+function setComTour(tour, el){
+  comTour = tour;
+  document.querySelectorAll('.cand-tour-btn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  comCandLoadRows();
+}
+
+function setModYear(y){
+  modYear = y;
+  YEARS.forEach(yr => document.getElementById('my-'+yr).classList.toggle('on', yr===y));
+  comCandLoadRows();
+  // Also refresh nuance grid
+  const grid = document.getElementById('m-grid');
+  grid.innerHTML = '';
+  const entry = modRef.kind === 'commune' ? RES.communes[y][modRef.code] : RES.marseilleSecteurs[y][modRef.code];
+  const cur = getNuanceStr(entry);
+  GRPS.forEach(grp => {
+    Object.entries(NU).filter(([,n]) => n.g === grp.id).forEach(([key, n]) => {
+      const b = document.createElement('button');
+      b.className = 'm-nb' + (key === cur ? ' on' : '');
+      b.innerHTML = `<span class="sw" style="background:${n.color}"></span><div><div class="m-nlbl">${key}</div><div class="m-ndsc">${n.label}</div></div>`;
+      b.onclick = () => {
+        const existing = modRef.kind === 'commune' ? RES.communes[modYear][modRef.code] : RES.marseilleSecteurs[modYear][modRef.code];
+        if(existing && typeof existing === 'object') existing.nuance = key;
+        else {
+          if(modRef.kind === 'commune') RES.communes[modYear][modRef.code] = key;
+          else RES.marseilleSecteurs[modYear][modRef.code] = key;
+        }
+        setModYear(modYear); refreshAll(); renderStats(); renderTable();
+      };
+      grid.appendChild(b);
+    });
+  });
+}
+
+function clearCom(){
+  if(!confirm('Effacer toutes les données pour ' + modRef.nom + ' en ' + modYear + ' ?')) return;
+  if(modRef.kind === 'commune') delete RES.communes[modYear][modRef.code];
+  else delete RES.marseilleSecteurs[modYear][modRef.code];
+  setModYear(modYear); refreshAll(); renderStats(); renderTable();
+}
+
+// ── Éditeur candidats dans le modal ──────────────────────────────
+function comCandGetEntry(){
+  return modRef.kind === 'commune'
+    ? RES.communes[modYear][modRef.code]
+    : RES.marseilleSecteurs[modYear][modRef.code];
+}
+
+function comCandLoadRows(){
+  const entry = comCandGetEntry();
+  const rich = getRich(entry);
+  const lists = rich ? (comTour === 'T1' ? rich.t1 : rich.t2) || [] : [];
+  const container = document.getElementById('com-cand-rows');
+  container.innerHTML = '';
+  lists.forEach(l => {
+    comCandAppendRow(container, l);
+    // Afficher les fusions en sous-éléments si T2
+    if(comTour === 'T2' && l.fusions && l.fusions.length){
+      const fusDiv = document.createElement('div');
+      fusDiv.style.cssText = 'padding:2px 8px 4px 28px;display:flex;flex-direction:column;gap:2px;';
+      l.fusions.forEach(f => {
+        const col = NU[f.nuance]?.color||'#888';
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:8.5px;opacity:.7;';
+        item.innerHTML = `<span style="width:6px;height:6px;border-radius:1px;background:${col};flex-shrink:0;display:inline-block"></span>`
+          + `<span style="color:${col};font-weight:600">${f.nuance}</span>`
+          + `<span style="color:var(--muted)">${f.tete||''}</span>`
+          + `<span style="color:var(--a2);font-size:7.5px">(fusion)</span>`;
+        fusDiv.appendChild(item);
+      });
+      container.appendChild(fusDiv);
+    }
+  });
+  // Griser le bouton T2 si élu au premier tour
+  updateT2Lock(rich);
+  comCandUpdateHint();
+}
+
+function isEluT1(rich){
+  if(!rich || !rich.t1 || !rich.t1.length) return false;
+  return !!(rich.t1.find(l => l.elu) || rich.t1[0].pct > 50);
+}
+
+function updateT2Lock(rich){
+  const btnT2 = document.getElementById('com-tour-T2');
+  if(!btnT2) return;
+  const locked = isEluT1(rich);
+  btnT2.classList.toggle('t2-locked', locked);
+  btnT2.title = locked ? 'Élu au 1er tour — pas de 2nd tour' : '';
+  // Si on est sur T2 alors que c'est verrouillé, revenir sur T1
+  if(locked && comTour === 'T2'){
+    comTour = 'T1';
+    document.getElementById('com-tour-T1').classList.add('on');
+    btnT2.classList.remove('on');
+    const t1Lists = rich?.t1 || [];
+    container.innerHTML = '';
+    t1Lists.forEach(l => comCandAppendRow(container, l));
+  }
+}
+
+function comCandUpdateHint(){
+  const hint = document.getElementById('com-save-hint');
+  const entry = comCandGetEntry();
+  const rich = getRich(entry);
+  const nu = getNuanceStr(entry);
+  if(nu){
+    hint.textContent = 'Couleur : ' + nu + ' — ' + (NU[nu]?.label||'');
+    hint.style.color = NU[nu]?.color || 'var(--ok)';
+  } else if(rich && (rich.t1 || rich.t2)){
+    hint.textContent = '⏳ 2nd tour attendu — pas de gagnant au T1 (< 50 %)';
+    hint.style.color = 'var(--gold)';
+  } else {
+    hint.textContent = 'Aucune donnée pour ce scrutin.';
+    hint.style.color = 'var(--muted)';
+  }
+}
+
+function comCandAppendRow(container, l={}){
+  const row = document.createElement('div');
+  row.className = 'cand-row' + (l.elu ? ' winner' : '');
+  // nuance : dot + select, mis à jour dynamiquement
+  const nuWrap = document.createElement('div');
+  nuWrap.className = 'cand-nu-wrap';
+  const nuDot = document.createElement('span');
+  nuDot.className = 'cand-nu-dot';
+  nuDot.style.background = l.nuance ? (NU[l.nuance]?.color||'#888') : '#555';
+  const nuSel = document.createElement('select');
+  nuSel.className = 'cand-nu-sel';
+  nuSel.style.flex = '1';
+  nuSel.innerHTML = Object.entries(NU).map(([k,n]) =>
+    `<option value="${k}" ${k===l.nuance?'selected':''}>${k} — ${n.label.slice(0,16)}</option>`
+  ).join('');
+  nuSel.title = l.nuance ? (NU[l.nuance]?.label||'') : '';
+  nuSel.onchange = () => {
+    nuDot.style.background = NU[nuSel.value]?.color || '#555';
+    nuSel.title = NU[nuSel.value]?.label || '';
+  };
+  nuWrap.appendChild(nuDot);
+  nuWrap.appendChild(nuSel);
+  row.appendChild(nuWrap);
+  // tete
+  const inp = document.createElement('input');
+  inp.className = 'cand-inp'; inp.type='text'; inp.placeholder='Tête de liste'; inp.value = l.tete||'';
+  row.appendChild(inp);
+  // pct
+  const pctInp = document.createElement('input');
+  pctInp.className = 'cand-pct'; pctInp.type='number'; pctInp.min=0; pctInp.max=100; pctInp.step=0.01;
+  pctInp.placeholder='%'; pctInp.value = l.pct != null ? l.pct : '';
+  row.appendChild(pctInp);
+  // elu — auto-coché si > 50 %, et radio-like (unique par container)
+  const eluWrap = document.createElement('div');
+  eluWrap.style.cssText = 'display:flex;justify-content:center;align-items:center';
+  const chk = document.createElement('input');
+  chk.type='checkbox'; chk.className='cand-chk';
+  // Auto-cocher si elu stocké OU si pct > 50
+  chk.checked = !!(l.elu || (typeof l.pct === 'number' && l.pct > 50));
+  chk.title = 'Liste gagnante (unique)';
+  chk.onchange = () => {
+    if(chk.checked){
+      // Décocher toutes les autres cases du même container
+      container.querySelectorAll('.cand-chk').forEach(c => { if(c !== chk){ c.checked = false; c.closest('.cand-row')?.classList.remove('winner'); }});
+    }
+    row.classList.toggle('winner', chk.checked);
+  };
+  if(chk.checked) row.classList.add('winner');
+  eluWrap.appendChild(chk); row.appendChild(eluWrap);
+  // désistement
+  const db = document.createElement('button');
+  db.className = 'desist-btn' + (l.desist ? ' active' : '');
+  db.textContent = 'D'; db.title = 'Marquer désistement';
+  if(l.desist) row.classList.add('desist');
+  db.onclick = () => {
+    db.classList.toggle('active');
+    row.classList.toggle('desist', db.classList.contains('active'));
+    // Si on marque désistement, annuler la fusion
+    if(db.classList.contains('active')){
+      row._fusedInto = null;
+      row.classList.remove('fused-in');
+      const fb2 = row.querySelector('.fusion-btn');
+      if(fb2) fb2.classList.remove('fused');
+    }
+  };
+  row.appendChild(db);
+  // fusion (seulement T1, affiché/masqué selon pct)
+  const fb = document.createElement('button');
+  fb.className = 'fusion-btn' + (l.fusedInto ? ' fused' : '');
+  fb.textContent = 'F'; fb.title = 'Fusionner dans une autre liste';
+  fb.style.display = (comTour === 'T1' && (l.pct||0) >= 5) ? '' : 'none';
+  if(l.fusedInto){
+    row.classList.add('fused-in');
+    row._fusedInto = l.fusedInto;
+    fb.title = "Fusionné dans " + (l.fusedInto.tete || l.fusedInto.nuance) + " — cliquer pour annuler";
+  }
+  // Stocker fusions (T2) sur la ligne pour que comCandCollect puisse les lire
+  if(l.fusions) row._fusions = l.fusions;
+  fb.onclick = () => startFusion(row, fb, container);
+  row.appendChild(fb);
+  // del
+  const del = document.createElement('button');
+  del.className='cand-del'; del.textContent='×'; del.title='Supprimer'; del.onclick=()=>row.remove();
+  row.appendChild(del);
+  container.appendChild(row);
+}
+
+function comCandAdd(){
+  comCandAppendRow(document.getElementById('com-cand-rows'));
+}
+
+function comCandCollect(){
+  return Array.from(document.querySelectorAll('#com-cand-rows .cand-row')).map(row => {
+    const [nuWrapEl, inpEl, pctEl, eluWrap, dbEl] = row.children;
+    const nuSel = nuWrapEl.tagName === 'SELECT' ? nuWrapEl : nuWrapEl.querySelector('select');
+    const obj = {
+      nuance: nuSel ? nuSel.value : '',
+      tete: inpEl.value.trim(),
+      pct: parseFloat(pctEl.value) || 0,
+      elu: eluWrap.querySelector('input').checked,
+      desist: !!(dbEl?.classList.contains('active'))
+    };
+    if(row._fusedInto) obj.fusedInto = row._fusedInto;
+    if(row._fusions && row._fusions.length) obj.fusions = row._fusions;
+    return obj;
+  }).filter(r => r.nuance && NU[r.nuance]);
+}
+
+function comCandSave(){
+  const fb = document.getElementById('com-cand-fb');
+  const lists = comCandCollect();
+  const sorted = [...lists].sort((a,b) => b.pct - a.pct);
+  // Get or create rich entry
+  const existing = comCandGetEntry();
+  const rich = getRich(existing) || { nuance: null, t1: null, t2: null };
+  // Snapshot du T2 courant pour récupérer les fusions si comCandCollect ne les a pas
+  const existingT2Snap = (comTour === 'T2' && rich.t2) ? rich.t2.map(r => ({...r})) : null;
+  const toStore = sorted.map(({nuance,tete,pct,elu,desist,fusedInto,fusions}) => {
+    const o={nuance,tete,pct};
+    if(elu) o.elu=true;
+    // desist : stocké en T1 pour rebuild T2, mais pas affiché en T1 dans le tooltip
+    if(desist) o.desist=true;
+    if(fusedInto) o.fusedInto=fusedInto;
+    // Préserver fusions depuis la collecte UI
+    if(fusions && fusions.length) o.fusions=fusions;
+    // Fallback : récupérer depuis le snapshot si la collecte UI n'avait pas les fusions
+    else if(existingT2Snap){
+      const snap = existingT2Snap.find(s => s.nuance===nuance && s.tete===tete);
+      if(snap?.fusions?.length) o.fusions = snap.fusions;
+    }
+    return o;
+  });
+  if(comTour === 'T1') rich.t1 = toStore.length ? toStore : null;
+  else {
+    rich.t2 = toStore.length ? toStore : null;
+    // Si T1 vide, pré-remplir T1 depuis T2 (candidats sans % ni elu)
+    if(!rich.t1 && rich.t2 && rich.t2.length){
+      rich.t1 = rich.t2.map(l => ({nuance:l.nuance, tete:l.tete, pct:0}));
+    }
+  }
+  // Pré-remplir T2 si T1 sauvé
+  if(comTour === 'T1'){
+    if(isEluT1(rich)){
+      rich.t2 = null;
+    } else {
+      const t2HasRealData = rich.t2 && rich.t2.some(l => l.pct > 0);
+      if(t2HasRealData){
+        // T2 déjà renseigné avec de vrais % : ne pas le toucher
+        // Juste mettre à jour les fusions si les fusedInto ont changé dans T1
+        const fused = rich.t1.filter(l => l.fusedInto);
+        rich.t2.forEach(row => {
+          const fusedToMe = fused.filter(f =>
+            f.fusedInto.nuance === row.nuance &&
+            (f.fusedInto.tete === row.tete || !f.fusedInto.tete)
+          );
+          if(fusedToMe.length) row.fusions = fusedToMe.map(f => ({nuance:f.nuance, tete:f.tete, pct:f.pct}));
+          else if(!fusedToMe.length && row.fusions) delete row.fusions;
+        });
+      } else {
+        // T2 vide ou pré-rempli à 0 : rebâtir en intégrant les fusions/désistements du T1
+        const prevT2 = rich.t2 ? rich.t2.map(r => ({...r})) : null;
+        rich.t2 = null;
+        prefillT2FromT1(rich);
+        // Réinjecter les % existants (cas pré-rempli avec 0%)
+        if(prevT2 && rich.t2){
+          rich.t2.forEach(row => {
+            const prev = prevT2.find(p => p.nuance === row.nuance && p.tete === row.tete);
+            if(prev){ row.pct = prev.pct; if(prev.elu) row.elu = true; }
+          });
+        }
+      }
+    }
+  }
+  // Mettre à jour le verrou T2 dans l'UI
+  updateT2Lock(rich);
+  // Règle : T2 > elu coché > T1 > 50 % — sinon pas de gagnant
+  const eluRow = lists.find(l => l.elu);
+  rich.nuance = resolveWinner(rich.t1, rich.t2, eluRow?.nuance || null);
+  // Store
+  if(modRef.kind === 'commune') RES.communes[modYear][modRef.code] = rich;
+  else RES.marseilleSecteurs[modYear][modRef.code] = rich;
+  const prefilled = comTour==='T1' && rich.t2 && rich.t2.length && rich.t2.every(l=>l.pct===0);
+  const msg = rich.nuance
+    ? '✓ Enregistré — ' + rich.nuance + ' · ' + (NU[rich.nuance]?.label||'')
+    : prefilled
+      ? '✓ Enregistré — 2nd tour pré-rempli avec ' + rich.t2.length + ' qualifié(s) ≥ 10 %'
+      : '✓ Enregistré — 2nd tour à saisir';
+  showFB(fb, 'ok', msg);
+  refreshAll(); renderStats(); renderTable();
+  comCandUpdateHint();
+  // Enregistrer dans l'historique
+  {
+    const _n = rich.nuance;
+    const _hasRealData = lists.some(l => l.pct > 0) || lists.some(l => l.elu);
+    if(_hasRealData && lists.length > 0){
+      const _winner = lists.find(l => l.elu || (l.pct && l.pct > 50)) || lists[0];
+      const _nom = modRef?.nom || modRef?.code || '';
+      histPush([{
+        nom: _nom, code: modRef?.code||'', year: modYear, tour: comTour,
+        nuance: _n||null, tete: _winner?.tete||'',
+        elu: !!(_winner?.elu || (_winner?.pct > 50))
+      }]);
+    }
+  }
+  ghAutoSync();
+  // Si on vient de sauver T1 et que T2 a été pré-rempli, proposer de passer en T2
+  if(prefilled){
+    setTimeout(()=>{
+      document.getElementById('com-tour-T2').click();
+    }, 600);
+  }
+}
+function closeMod(e, id){ if(e && e.target === document.getElementById(id)){ document.getElementById(id).classList.remove('open'); ghResumePoll(); } }
+function forceClose(id){ document.getElementById(id).classList.remove('open'); ghResumePoll(); }
+
+function renderStats(){
+  const yr = curStatYear;
+  document.getElementById('stats-yr').textContent = yr;
+  const el = document.getElementById('stats-wrap');
+  const tel = document.getElementById('stats-total');
+  const cnt = {};
+  Object.values(RES.communes[yr]).forEach(e => { const n=getNuanceStr(e); if(n) cnt[n]=(cnt[n]||0)+1; });
+  Object.values(RES.marseilleSecteurs[yr]).forEach(e => { const n=getNuanceStr(e); if(n) cnt[n]=(cnt[n]||0)+1; });
+  const tot = Object.values(cnt).reduce((a,b)=>a+b,0);
+  if(!tot){ el.innerHTML = `<div style="font-size:9px;color:var(--muted);font-style:italic">Aucune donnée pour ${yr}</div>`; tel.textContent=''; return; }
+  el.innerHTML = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k,c]) => {
+    const n = NU[k]; const pct = (c/tot*100).toFixed(0);
+    return `<div class="st-row"><div class="st-lbl" title="${n.label}"><span style="display:inline-block;width:6px;height:6px;border-radius:1px;background:${n.color};margin-right:3px;vertical-align:middle"></span>${k}</div><div class="st-bg"><div class="st-fg" style="width:${pct}%;background:${n.color}"></div></div><div class="st-n">${c}</div></div>`;
+  }).join('');
+  tel.textContent = `${tot} zone(s) renseignée(s) — communes + secteurs Marseille`;
+}
+
+function renderTable(){
+  if(!geoData) return;
+  const q = tblQ.toLowerCase();
+  const rows = geoData.features
+    .filter(f => !q || f.properties.nom.toLowerCase().includes(q))
+    .map(f => ({kind:'commune', nom:f.properties.nom, code:f.properties.code}))
+    .concat(Object.keys(SECTOR_LABELS).map(k => ({kind:'sector', nom:'Marseille — ' + SECTOR_LABELS[k], code:k})))
+    .filter(r => !q || r.nom.toLowerCase().includes(q) || r.code.toLowerCase().includes(q))
+    .sort((a,b) => a.nom.localeCompare(b.nom, 'fr'));
+
+  function cell(row, yr){
+    const entry = row.kind === 'commune' ? RES.communes[yr][row.code] : RES.marseilleSecteurs[yr][row.code];
+    const n = getNuanceStr(entry);
+    if(!n) return `<td><span style="color:var(--muted)">—</span></td>`;
+    return `<td><div class="t-val"><span class="t-sw" style="background:${NU[n]?.color||'#888'}"></span>${n}</div></td>`;
+  }
+  document.getElementById('tbl-body').innerHTML = rows.map(r => {
+    const chg = r.kind === 'commune' ? comboDelta(r.code) : comboDeltaSector(r.code);
+    const safeNom = r.nom.replace(/'/g,"\\'");
+    return `<tr onclick="openModal({kind:'${r.kind}', code:'${r.code}', nom:'${safeNom}'})"><td class="t-nom">${r.nom}</td><td class="t-code">${r.code}</td>${cell(r,2014)}${cell(r,2020)}${cell(r,2026)}<td style="text-align:center">${chg ? '<span class="t-chg"></span>' : ''}</td></tr>`;
+  }).join('');
+}
+function filterTbl(v){ tblQ = v; renderTable(); }
+
+function openExport(){
+  document.getElementById('imp-area').value = '';
+  const fb = document.getElementById('exp-fb');
+  fb.className = 'fb'; fb.textContent = '';
+  document.getElementById('mod-exp').classList.add('open');
+}
+function buildExportObject(){
+  return {
+    communes: RES.communes,
+    marseilleSecteurs: RES.marseilleSecteurs,
+    nuances: NU,
+    settings: { visibleYears, viewMode, isDark }
+  };
+}
+function exportJSON(){
+  const json = JSON.stringify(buildExportObject(), null, 2);
+  const date = new Date().toISOString().slice(0,10);
+  dlBlob(new Blob([json], {type:'application/json;charset=utf-8'}), `carte_bdr_${date}.json`);
+}
+function copyJSON(){
+  const fb = document.getElementById('exp-fb');
+  const json = JSON.stringify(buildExportObject(), null, 2);
+  navigator.clipboard?.writeText(json)
+    .then(() => showFB(fb, 'ok', '✓ JSON copié dans le presse-papier.'))
+    .catch(() => showFB(fb, 'er', 'Impossible de copier — utilisez Télécharger.'));
+}
+function applyLoadedData(d){
+  const c = d.communes || {};
+  const m = d.marseilleSecteurs || {};
+  let ok = 0;
+  // Restore nuance colors if present
+  if(d.nuances){ Object.entries(d.nuances).forEach(([k,v]) => { if(NU[k] && v?.color) NU[k].color = v.color; }); }
+  // Restore settings
+  if(d.settings){
+    if(d.settings.isDark !== undefined && d.settings.isDark !== isDark){ isDark = d.settings.isDark; document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light'); }
+    if(Array.isArray(d.settings.visibleYears) && d.settings.visibleYears.length){ visibleYears = d.settings.visibleYears; curStatYear = visibleYears[0]; }
+    if(d.settings.viewMode){ viewMode = d.settings.viewMode; const btn=document.getElementById('marseille-tab-btn'); if(btn){ btn.classList.toggle('msmode',viewMode==='marseille'); btn.textContent = viewMode==='marseille'?'🏙 Marseille — Secteurs ✓':'🏙 Marseille — Secteurs'; } }
+  }
+  YEARS.forEach(yr => {
+    const cc = c[yr] || c[String(yr)] || {};
+    Object.entries(cc).forEach(([code, entry]) => {
+      if(typeof entry === 'string'){
+        if(NU[entry]) { RES.communes[yr][code] = entry; ok++; }
+      } else if(entry && typeof entry === 'object'){
+        // Accepter même si nuance=null (commune en attente T2)
+        const hasData = entry.t1?.length || entry.t2?.length || (entry.nuance && NU[entry.nuance]);
+        if(hasData){ RES.communes[yr][code] = entry; ok++; }
+      }
+    });
+    const mm = m[yr] || m[String(yr)] || {};
+    Object.entries(mm).forEach(([code, entry]) => {
+      if(!SECTOR_LABELS[code]) return;
+      if(typeof entry === 'string'){
+        if(NU[entry]) { RES.marseilleSecteurs[yr][code] = entry; ok++; }
+      } else if(entry && typeof entry === 'object'){
+        const hasData = entry.t1?.length || entry.t2?.length || (entry.nuance && NU[entry.nuance]);
+        if(hasData){ RES.marseilleSecteurs[yr][code] = entry; ok++; }
+      }
+    });
+  });
+  // Recalculer toutes les nuances via resolveWinner pour corriger données obsolètes
+  normalizeAllNuances();
+  return ok;
+}
+
+// Recalcule la nuance de toutes les entrées riches selon les règles actuelles
+function normalizeAllNuances(){
+  YEARS.forEach(yr => {
+    Object.entries(RES.communes[yr]).forEach(([code, entry]) => {
+      if(entry && typeof entry === 'object'){
+        const eluNuance = (entry.t1 || entry.t2 || []).find ? 
+          ((entry.t2 || []).find(l=>l.elu) || (entry.t1 || []).find(l=>l.elu))?.nuance || null : null;
+        entry.nuance = resolveWinner(entry.t1, entry.t2, eluNuance);
+      }
+    });
+    Object.entries(RES.marseilleSecteurs[yr]).forEach(([code, entry]) => {
+      if(entry && typeof entry === 'object'){
+        const eluNuance = ((entry.t2 || []).find(l=>l.elu) || (entry.t1 || []).find(l=>l.elu))?.nuance || null;
+        entry.nuance = resolveWinner(entry.t1, entry.t2, eluNuance);
+      }
+    });
+  });
+}
+function importJSON(){
+  const raw = document.getElementById('imp-area').value.trim();
+  const fb = document.getElementById('exp-fb');
+  if(!raw){ showFB(fb, 'er', 'Zone vide.'); return; }
+  try {
+    const d = JSON.parse(raw);
+    const ok = applyLoadedData(d);
+    showFB(fb, 'ok', `✓ ${ok} entrée(s) importée(s).`);
+    buildPalette(); syncYearBtns(); buildMaps(); refreshAll(); renderStats(); renderTable(); ghAutoSync();
+  } catch(e) { showFB(fb, 'er', 'JSON invalide : ' + e.message); }
+}
+async function autoLoadJSON(showMsg=false){
+  try {
+    const r = await fetch('./carte_bdr.json?t=' + Date.now(), {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    applyLoadedData(d);
+    if(showMsg) console.log('JSON auto chargé depuis ../carte_bdr.json');
+  } catch(e) {
+    if(showMsg) console.warn('JSON auto non chargé :', e.message);
+  }
+}
+function dlBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+function showFB(el, type, msg){ el.className = 'fb ' + type; el.textContent = msg; }
+
+function renderRichLists(lists, maxPct, isT2=false){
+  if(!lists || !lists.length) return '';
+  let h = '';
+  lists.forEach((l, i) => {
+    const nu = l.nuance; const col = NU[nu]?.color || '#888';
+    const nuLabel = NU[nu]?.label || nu || '';
+    const pct = typeof l.pct === 'number' ? l.pct : 0;
+    const barW = maxPct > 0 ? Math.round(pct / maxPct * 100) : 0;
+    const tete = l.tete || (l.prenom ? l.prenom + ' ' + l.nom : null) || l.liste || nu;
+    const isFirst = i === 0;
+    // Ligne principale : dot · tête · badge nuance code · barre · %
+    h += `<div class="tt-list-row${isFirst?' winner':''}">`;
+    h += `<span class="tt-sw" style="background:${col};flex-shrink:0"></span>`;
+    h += `<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap${(isT2 && l.desist)?';opacity:.5;text-decoration:line-through':''}" title="${tete} — ${nuLabel}">${tete}</span>`;
+    h += `<span class="tt-nu-badge" style="color:${col}">${nu}</span>`;
+    h += `<div class="tt-pct-bar"><div class="tt-pct-fill" style="width:${barW}%;background:${col}"></div></div>`;
+    h += `<span class="tt-pct-val">${pct > 0 ? pct.toFixed(1)+'%' : '—'}</span>`;
+    if(l.elu || (isFirst && pct > 50)) h += `<span class="tt-crown">✓</span>`;
+    h += `</div>`;
+    // Sous-ligne : libellé complet de la nuance
+    h += `<div style="font-size:8px;color:${col};opacity:.8;padding:0 0 3px 13px;line-height:1.2">${nuLabel}</div>`;
+    // Fusions rattachées à cette liste
+    if(l.fusions && l.fusions.length){
+      l.fusions.forEach(f => {
+        const fc = NU[f.nuance]?.color || '#888';
+        h += `<div class="tt-fusion-item">`;
+        h += `<span class="tt-sw" style="background:${fc}"></span>`;
+        h += `<span style="color:${fc};font-weight:600">${f.nuance}</span>`;
+        h += `<span style="color:var(--muted);margin-left:2px">${f.tete||''}</span>`;
+        h += `<span style="color:var(--a2);font-size:7px;margin-left:3px">(fusion)</span>`;
+        h += `</div>`;
+      });
+    }
+  });
+  return h;
+}
+
+// ─── Rendu d'un bloc année dans le tooltip ──────────────────────
+function renderTooltipYearBlock(entry, isMain){
+  const rich = getRich(entry);
+  const n = getNuanceStr(entry);
+  let h = '';
+  if(rich && (rich.t1 || rich.t2)){
+    const t2HasReal = rich.t2 && rich.t2.length && rich.t2.some(l => l.pct > 0);
+    const t1HasReal = rich.t1 && rich.t1.length && rich.t1.some(l => l.pct > 0);
+    if(t2HasReal){
+      if(t1HasReal && isMain && !soirMode){
+        h += `<div style="font-size:${isMain?'8':'7.5'}px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px">1er tour</div>`;
+        const maxT1 = Math.max(...rich.t1.map(l=>l.pct||0));
+        h += renderRichLists(rich.t1, maxT1);
+      }
+      h += `<div style="font-size:${isMain?'8':'7.5'}px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:${isMain?'3':'1'}px 0 2px">${isMain?'2nd tour':'T2'}</div>`;
+      const maxT2 = Math.max(...rich.t2.map(l=>l.pct||0));
+      h += renderRichLists(rich.t2, maxT2, true);
+    } else {
+      const lists = rich.t1 || [];
+      const maxPct = lists.length ? Math.max(...lists.map(l=>l.pct||0)) : 0;
+      const eluT1 = lists.find(l=>l.elu) || (lists[0]?.pct > 50 ? lists[0] : null);
+      if(eluT1) h += `<div style="font-size:${isMain?'8':'7.5'}px;color:var(--ok);margin-bottom:2px">✓ Élu au 1er tour</div>`;
+      else if(rich.t2 && rich.t2.length) h += `<div style="font-size:${isMain?'8':'7.5'}px;color:var(--gold);margin-bottom:2px">⏳ 2nd tour en attente</div>`;
+      h += renderRichLists(lists, maxPct);
+    }
+  } else if(n){
+    const col = NU[n]?.color||'#888';
+    if(isMain){
+      h += `<div class="tt-row"><span class="tt-sw" style="background:${col}"></span><span style="font-size:11px;font-weight:600;color:${col}">${n}</span><span style="font-size:9px;color:var(--muted);margin-left:4px">${NU[n]?.label||''}</span></div>`;
+    } else {
+      h += `<div class="tt-row"><span class="tt-sw" style="background:${col}"></span><span>${n} · ${NU[n]?.label||''}</span></div>`;
+    }
+  }
+  return h;
+}
+
+// ─── Résumé sectoriel Marseille (loi PLM : 2014 & 2020) ──────────
+const MARSEILLE_PLM_YEARS = new Set([2014, 2020]);
+
+function makeMarseilleSectorSummary(yr, isMain){
+  const fontSize = isMain ? 10 : 8.5;
+  const dotSize  = isMain ? 8  : 6;
+  let h = '';
+  const hasSectorData = Object.keys(SECTOR_LABELS).some(k => {
+    const e = RES.marseilleSecteurs[yr][k];
+    return e && (getNuanceStr(e) || getRich(e));
+  });
+  if(!hasSectorData){
+    h += `<div style="font-size:${fontSize}px;color:var(--muted);font-style:italic">Résultats par secteur non renseignés — mode Marseille</div>`;
+    return h;
+  }
+  Object.entries(SECTOR_LABELS).forEach(([k, lbl]  ) => {
+    const entry = RES.marseilleSecteurs[yr][k];
+    const n = getNuanceStr(entry);
+    const col = n ? NU[n]?.color||'#888' : null;
+    const secShort = lbl.replace('Secteur ', 'S').replace(/\s*\(.*\)/, '');
+    h += `<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;font-size:${fontSize}px">`;
+    h += `<span style="font-family:'IBM Plex Mono',monospace;color:var(--muted);min-width:20px">${secShort}</span>`;
+    if(col){
+      h += `<span style="width:${dotSize}px;height:${dotSize}px;border-radius:2px;background:${col};flex-shrink:0"></span>`;
+      h += `<span style="color:${col};font-weight:600">${n}</span>`;
+      if(isMain) h += `<span style="color:var(--muted);font-size:8.5px;margin-left:2px">${NU[n]?.label||''}</span>`;
+    } else {
+      h += `<span style="color:var(--muted);font-style:italic">—</span>`;
+    }
+    h += `</div>`;
+  });
+  if(isMain) h += `<div style="font-size:8px;color:var(--muted);margin-top:4px;font-style:italic">Scrutin par secteur (loi PLM) — détail : mode Marseille</div>`;
+  return h;
+}
+function makeTooltipCommune(code, nom, activeYr){
+  // Année mise en avant = celle de la carte survolée (ou dernière visible si non précisée)
+  const mainYr = activeYr || visibleYears[visibleYears.length - 1];
+  let h = `<div class="tt-nom">${nom}</div><div class="tt-code">${code}</div>`;
+  let hasData = false;
+
+  // Ordre toujours 2026 → 2020 → 2014 (plus récent en haut)
+  // L'année active (mainYr) est affichée en grand, les autres en petit
+  const isMarseille = (code === '13055');
+  const displayOrder = [2026, 2020, 2014];
+
+  displayOrder.forEach(yr => {
+    const isMain = (yr === mainYr);
+    const entry = RES.communes[yr][code];
+    const n = getNuanceStr(entry);
+    const hasSect = isMarseille && MARSEILLE_PLM_YEARS.has(yr)
+      && Object.keys(SECTOR_LABELS).some(k => { const e = RES.marseilleSecteurs[yr][k]; return e && (getNuanceStr(e)||getRich(e)); });
+    const hasRaw = !!(entry && (getRich(entry) || n)) || hasSect;
+    if(!hasRaw) return;
+    hasData = true;
+    const col = n ? NU[n]?.color : null;
+    h += `<div class="tt-sep"></div>`;
+    if(isMain){
+      h += `<div class="tt-yr-main">${yr}${col ? ` <span style="color:${col}">▐</span>` : ''}</div>`;
+      if(isMarseille && MARSEILLE_PLM_YEARS.has(yr)){
+        h += makeMarseilleSectorSummary(yr, true);
+      } else {
+        const block = renderTooltipYearBlock(entry, true);
+        h += block || `<div style="font-size:9px;color:var(--gold)">⏳ 2nd tour en attente</div>`;
+      }
+    } else {
+      h += `<div class="tt-yr-other">${yr}${col ? ` <span style="color:${col};opacity:.7">▐</span>` : ''}</div>`;
+      if(isMarseille && MARSEILLE_PLM_YEARS.has(yr)){
+        h += `<div class="tt-other-block">${makeMarseilleSectorSummary(yr, false)}</div>`;
+      } else {
+        h += `<div class="tt-other-block">${renderTooltipYearBlock(entry, false)}</div>`;
+      }
+    }
+  });
+
+  if(!hasData) h += `<div style="font-size:11px;color:var(--muted);margin-top:6px">Aucune donnée saisie</div>`;
+  return h;
+}
+function makeTooltipMarseille(code, label, activeYr){
+  const sec = normalizeSectorKey(code) || code;
+  const mainYr = activeYr || visibleYears[visibleYears.length - 1];
+  let h = `<div class="tt-nom">${label || SECTOR_LABELS[sec] || sec}</div><div class="tt-code">${sec}</div>`;
+  let hasData = false;
+
+  const displayOrder = [2026, 2020, 2014];
+
+  displayOrder.forEach(yr => {
+    const isMain = (yr === mainYr);
+    const entry = sec ? RES.marseilleSecteurs[yr][sec] : null;
+    const n = getNuanceStr(entry);
+    const hasRaw = !!(entry && (getRich(entry) || n));
+    if(!hasRaw) return;
+    hasData = true;
+    const col = n ? NU[n]?.color : null;
+    h += `<div class="tt-sep"></div>`;
+    if(isMain){
+      h += `<div class="tt-yr-main">${yr}${col ? ` <span style="color:${col}">▐</span>` : ''}</div>`;
+      const block = renderTooltipYearBlock(entry, true);
+      h += block || `<div style="font-size:9px;color:var(--gold)">⏳ 2nd tour en attente</div>`;
+    } else {
+      h += `<div class="tt-yr-other">${yr}${col ? ` <span style="color:${col};opacity:.7">▐</span>` : ''}</div>`;
+      h += `<div class="tt-other-block">${renderTooltipYearBlock(entry, false)}</div>`;
+    }
+  });
+
+  if(!hasData) h += `<div style="font-size:11px;color:var(--muted);margin-top:6px">Aucune donnée de secteur</div>`;
+  return h;
+}
+
+function openSettings(){
+  const cnt = document.getElementById('set-rows');
+  cnt.innerHTML = '';
+  GRPS.forEach(grp => {
+    const entries = Object.entries(NU).filter(([,n]) => n.g === grp.id);
+    if (!entries.length) return;
+    const hdr = document.createElement('div'); hdr.className='g-hdr'; hdr.textContent = grp.label; cnt.appendChild(hdr);
+    entries.forEach(([key, n]) => {
+      const row = document.createElement('div'); row.className='s-row';
+      const sw = document.createElement('div'); sw.className='s-sw'; sw.style.background = n.color;
+      const inp = document.createElement('input'); inp.type='color'; inp.value=n.color; inp.style.cssText='position:absolute;opacity:0;width:0;height:0;pointer-events:none';
+      inp.addEventListener('input', e => { NU[key].color = e.target.value; sw.style.background = e.target.value; buildPalette(); refreshAll(); renderStats(); renderTable(); });
+      sw.onclick = () => inp.click();
+      row.innerHTML = `<div class="s-name">${n.label}</div><div class="s-key">${key}</div>`;
+      row.prepend(sw); row.appendChild(inp); cnt.appendChild(row);
+    });
+  });
+  document.getElementById('mod-set').classList.add('open');
+}
+function resetColors(){ NU = JSON.parse(JSON.stringify(NU_DEF)); openSettings(); buildPalette(); refreshAll(); renderStats(); renderTable(); }
+function doReset(){ if(!confirm('Effacer toutes les données saisies ?')) return; RES = { communes:{2014:{},2020:{},2026:{}}, marseilleSecteurs:{2014:{},2020:{},2026:{}} }; refreshAll(); renderStats(); renderTable(); }
+
+</script>
+
+<div id="mod-ed" class="m-bg" onclick="closeMod(event,'mod-ed')">
+  <div class="m-box" id="ed-modal">
+    <h2>Saisie des candidats</h2>
+    <p class="m-sub">Communes &amp; secteurs déjà renseignés (cliquer pour éditer) :</p>
+    <div class="ed-filled-list" id="ed-filled-list"></div>
+    <p class="m-sub" style="margin-bottom:4px">Ou rechercher une autre commune :</p>
+    <div class="ed-search-wrap">
+      <input class="ed-search" id="ed-search" placeholder="Rechercher une commune ou secteur…" oninput="edSearchInput(this.value)" autocomplete="off">
+    </div>
+    <div class="ed-sugg" id="ed-sugg"></div>
+
+    <div id="ed-selected-lbl" style="font-size:11px;font-weight:600;margin-bottom:8px;color:var(--a2);min-height:16px"></div>
+
+    <div class="ed-ctx">
+      <span class="ed-ctx-lbl">Année</span>
+      <button class="ed-yr-btn on" id="ed-yr-2014" onclick="setEdYr(2014,this)">2014</button>
+      <button class="ed-yr-btn" id="ed-yr-2020" onclick="setEdYr(2020,this)">2020</button>
+      <button class="ed-yr-btn" id="ed-yr-2026" onclick="setEdYr(2026,this)">2026</button>
+      <span class="ed-ctx-lbl" style="margin-left:8px">Tour</span>
+      <button class="ed-tour-btn on" id="ed-tour-T1" onclick="setEdTour('T1',this)">T1</button>
+      <button class="ed-tour-btn" id="ed-tour-T2" onclick="setEdTour('T2',this)">T2</button>
+    </div>
+
+    <div class="ed-hdr">
+      <span>Nuance</span><span>Tête de liste</span><span style="text-align:right">%</span><span style="text-align:center">Élu</span><span></span>
+    </div>
+    <div class="ed-rows" id="ed-rows"></div>
+    <button class="ed-add-btn" onclick="edAddRow()">+ Ajouter une liste</button>
+
+    <div class="fb" id="ed-fb" style="margin-top:8px"></div>
+    <div class="ed-actions">
+      <button class="bs" onclick="edClear()">Effacer ce tour</button>
+      <button class="bs" onclick="forceClose('mod-ed')">Fermer</button>
+      <button class="bp" onclick="edSave()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="mod-gh" class="m-bg" onclick="closeMod(event,'mod-gh')">
+  <div class="m-box" id="gh-modal">
+    <h2>Synchronisation GitHub</h2>
+    <p class="m-sub">Les modifications sont poussées automatiquement dans ton dépôt GitHub. Le token est stocké localement dans ton navigateur.</p>
+
+    <div class="gh-row">
+      <label class="gh-lbl">Personal Access Token (repo scope)</label>
+      <input class="gh-inp" id="gh-token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+      <span style="font-size:8.5px;color:var(--muted)">Génère-le sur github.com → Settings → Developer settings → Personal access tokens → Fine-grained → Contents: Read & Write</span>
+    </div>
+    <div class="gh-row">
+      <label class="gh-lbl">Propriétaire (username ou org)</label>
+      <input class="gh-inp" id="gh-owner" placeholder="ton-pseudo">
+    </div>
+    <div class="gh-row">
+      <label class="gh-lbl">Nom du dépôt</label>
+      <input class="gh-inp" id="gh-repo" placeholder="carte-bdr">
+    </div>
+    <div class="gh-row">
+      <label class="gh-lbl">Chemin du fichier JSON dans le dépôt</label>
+      <input class="gh-inp" id="gh-path" placeholder="carte_bdr.json">
+    </div>
+    <div class="gh-row">
+      <label class="gh-lbl">Branche</label>
+      <input class="gh-inp" id="gh-branch" placeholder="main">
+    </div>
+
+    <div class="gh-status" id="gh-config-status"></div>
+
+    <div class="gh-row" style="margin-top:12px">
+      <label class="gh-lbl">Chemin du fichier son de cloche (local)</label>
+      <input class="gh-inp" id="gh-bell" placeholder="./cloche.mp3">
+      <span style="font-size:8.5px;color:var(--muted)">Placez un fichier .mp3 dans le même dossier que index.html et indiquez son nom ici.</span>
+    </div>
+    <div class="opt-line" style="margin-top:8px">
+      <label style="font-size:10.5px;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="gh-auto" style="accent-color:var(--accent)">
+        Synchronisation automatique à chaque enregistrement
+      </label>
+    </div>
+    <div class="opt-line">
+      <label style="font-size:10.5px;cursor:pointer;display:flex;align-items:center;gap:6px">
+        <input type="checkbox" id="gh-poll" style="accent-color:var(--accent)" onchange="document.getElementById('gh-poll-interval-row').style.display=this.checked?'flex':'none'">
+        Actualisation automatique (pour les autres postes)
+      </label>
+    </div>
+    <div class="opt-line" id="gh-poll-interval-row" style="display:none;padding-left:20px">
+      <span style="font-size:10px;color:var(--muted)">Intervalle :</span>
+      <select id="gh-poll-interval" style="font-size:10px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:2px 6px;border-radius:4px;cursor:pointer">
+        <option value="15">15 secondes</option>
+        <option value="30" selected>30 secondes</option>
+        <option value="60">1 minute</option>
+        <option value="120">2 minutes</option>
+        <option value="300">5 minutes</option>
+      </select>
+    </div>
+
+    <div class="m-act">
+      <button class="bs" onclick="ghClearConfig()">Effacer</button>
+      <button class="bs" onclick="ghTest()">🔍 Tester</button>
+      <button class="bs" onclick="forceClose('mod-gh')">Fermer</button>
+      <button class="bp" onclick="ghSaveConfig()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="hist-modal" class="m-bg" onclick="closeMod(event,'hist-modal')">
+  <div class="m-box hist-panel" style="width:380px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <h2 style="margin:0">Historique des saisies</h2>
+      <button class="bs" onclick="clearHistory()">Effacer</button>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+<div id="notif-panel"></div>
+</body>
+</html>
