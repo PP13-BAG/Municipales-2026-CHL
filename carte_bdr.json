@@ -7115,12 +7115,13 @@
         "t2": null
       },
       "13029": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Daniel GAGNON",
-            "pct": 58.99
+            "pct": 58.99,
+            "elu": true
           },
           {
             "nuance": "LDIV",
