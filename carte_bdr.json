@@ -1,0 +1,148 @@
+{
+  "communes": {
+    "2014": {},
+    "2020": {},
+    "2026": {}
+  },
+  "marseilleSecteurs": {
+    "2014": {},
+    "2020": {},
+    "2026": {}
+  },
+  "nuances": {
+    "LEXG": {
+      "label": "Extrême gauche",
+      "color": "#6b0000",
+      "g": "exg"
+    },
+    "LFI": {
+      "label": "La France Insoumise",
+      "color": "#b5002b",
+      "g": "g"
+    },
+    "LCOM": {
+      "label": "Parti Communiste Français",
+      "color": "#c62828",
+      "g": "g"
+    },
+    "LSOC": {
+      "label": "Parti Socialiste",
+      "color": "#e91e8c",
+      "g": "g"
+    },
+    "LVEC": {
+      "label": "Les Écologistes",
+      "color": "#1b5e20",
+      "g": "g"
+    },
+    "LUG": {
+      "label": "Union de la gauche",
+      "color": "#a01060",
+      "g": "g"
+    },
+    "LDVG": {
+      "label": "Divers gauche",
+      "color": "#f06292",
+      "g": "g"
+    },
+    "LECO": {
+      "label": "Écologiste (hors Les Éco.)",
+      "color": "#388e3c",
+      "g": "g"
+    },
+    "LREG": {
+      "label": "Régionalistes / autonomistes",
+      "color": "#7b1fa2",
+      "g": "g"
+    },
+    "LDIV": {
+      "label": "Divers",
+      "color": "#78909c",
+      "g": "div"
+    },
+    "LREN": {
+      "label": "Renaissance",
+      "color": "#d4a000",
+      "g": "c"
+    },
+    "LMDM": {
+      "label": "MoDem",
+      "color": "#f57c00",
+      "g": "c"
+    },
+    "LHOR": {
+      "label": "Horizons",
+      "color": "#ef8c00",
+      "g": "c"
+    },
+    "LUDI": {
+      "label": "UDI",
+      "color": "#42a5f5",
+      "g": "c"
+    },
+    "LUC": {
+      "label": "Union du centre",
+      "color": "#64b5f6",
+      "g": "c"
+    },
+    "LDVC": {
+      "label": "Divers centre",
+      "color": "#90caf9",
+      "g": "c"
+    },
+    "LLR": {
+      "label": "Les Républicains",
+      "color": "#1565c0",
+      "g": "dr"
+    },
+    "LUD": {
+      "label": "Union de la droite",
+      "color": "#0d3a8e",
+      "g": "dr"
+    },
+    "LDVD": {
+      "label": "Divers droite",
+      "color": "#5e8fcc",
+      "g": "dr"
+    },
+    "LDSV": {
+      "label": "Droite souverainiste",
+      "color": "#0a265e",
+      "g": "dr"
+    },
+    "LUDR": {
+      "label": "Union des droites pour la République",
+      "color": "#08194a",
+      "g": "dr"
+    },
+    "LRN": {
+      "label": "Rassemblement National",
+      "color": "#1a1a7e",
+      "g": "exd"
+    },
+    "LREC": {
+      "label": "Reconquête",
+      "color": "#4a0808",
+      "g": "exd"
+    },
+    "LUXD": {
+      "label": "Union de l'extrême droite",
+      "color": "#2e0a0a",
+      "g": "exd"
+    },
+    "LEXD": {
+      "label": "Extrême droite",
+      "color": "#1c1c1c",
+      "g": "exd"
+    }
+  },
+  "settings": {
+    "visibleYears": [
+      2014,
+      2020,
+      2026
+    ],
+    "viewMode": "dept",
+    "isDark": true
+  }
+}
