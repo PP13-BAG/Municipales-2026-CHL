@@ -7740,7 +7740,7 @@
         "t2": null
       },
       "13055": {
-        "nuance": "LRN",
+        "nuance": null,
         "t1": [
           {
             "nuance": "LUG",
@@ -7792,8 +7792,7 @@
           {
             "nuance": "LRN",
             "tete": "Franck ALLISIO",
-            "pct": 0,
-            "elu": true
+            "pct": 0
           },
           {
             "nuance": "LFI",
