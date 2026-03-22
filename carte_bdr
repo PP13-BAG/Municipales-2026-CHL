@@ -7740,7 +7740,7 @@
         "t2": null
       },
       "13055": {
-        "nuance": "LDVD",
+        "nuance": "LRN",
         "t1": [
           {
             "nuance": "LUG",
@@ -7787,13 +7787,13 @@
           {
             "nuance": "LRN",
             "tete": "Franck ALLISIO",
-            "pct": 0
+            "pct": 0,
+            "elu": true
           },
           {
             "nuance": "LDVD",
             "tete": "Martine VASSAL",
-            "pct": 0,
-            "elu": true
+            "pct": 0
           },
           {
             "nuance": "LFI",
