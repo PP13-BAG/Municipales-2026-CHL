@@ -6457,12 +6457,13 @@
         "t2": null
       },
       "13003": {
-        "nuance": "LDIV",
+        "nuance": "LECO",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LECO",
             "tete": "Catherine MOYEMONT GAILDRY",
-            "pct": 52.72
+            "pct": 52.72,
+            "elu": true
           },
           {
             "nuance": "LDIV",
