@@ -6605,12 +6605,13 @@
         ]
       },
       "13006": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Lionel ESCOFFIER",
-            "pct": 79.41
+            "pct": 79.41,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -6642,12 +6643,13 @@
         "t2": null
       },
       "13008": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Sophie KERNEN",
-            "pct": 50.12
+            "pct": 50.12,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -6717,12 +6719,13 @@
         "t2": null
       },
       "13013": {
-        "nuance": "LDIV",
+        "nuance": "LDVG",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LDVG",
             "tete": "Gilles COLLOMB",
-            "pct": 52.57
+            "pct": 52.57,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -6828,7 +6831,8 @@
           {
             "nuance": "LDIV",
             "tete": "Jérémie BECCIU",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
