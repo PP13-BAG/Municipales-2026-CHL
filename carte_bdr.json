@@ -9120,7 +9120,7 @@
         "t2": null
       },
       "13112": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -9142,17 +9142,18 @@
           {
             "nuance": "LDVD",
             "tete": "Yannick GUÉRIN",
-            "pct": 0
+            "pct": 49.33,
+            "elu": true
           },
           {
             "nuance": "LDVG",
             "tete": "Philippe CHABANON",
-            "pct": 0
+            "pct": 27.16
           },
           {
             "nuance": "LDVD",
             "tete": "Alexandra COURTEIX",
-            "pct": 0
+            "pct": 23.51
           }
         ]
       },
