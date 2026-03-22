@@ -8664,12 +8664,13 @@
         ]
       },
       "13096": {
-        "nuance": null,
+        "nuance": "LDIV",
         "t1": [
           {
             "nuance": "LDIV",
             "tete": "Didier HONORE",
-            "pct": 34.77
+            "pct": 34.77,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -8687,23 +8688,7 @@
             "pct": 5.49
           }
         ],
-        "t2": [
-          {
-            "nuance": "LDIV",
-            "tete": "Didier HONORE",
-            "pct": 0
-          },
-          {
-            "nuance": "LDIV",
-            "tete": "Thibaut MENA",
-            "pct": 0
-          },
-          {
-            "nuance": "LDIV",
-            "tete": "Christelle AILLET",
-            "pct": 0
-          }
-        ]
+        "t2": null
       },
       "13097": {
         "nuance": "LDVC",
