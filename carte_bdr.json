@@ -5274,7 +5274,7 @@
         "t2": null
       },
       "13096": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
             "nuance": "LDIV",
@@ -5284,9 +5284,10 @@
         ],
         "t2": [
           {
-            "nuance": "LDIV",
+            "nuance": "LLR",
             "tete": "Roland CHASSAIN",
-            "pct": 52.48
+            "pct": 52.48,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -5671,12 +5672,13 @@
         ]
       },
       "13111": {
-        "nuance": "LDIV",
+        "nuance": "LUDI",
         "t1": [
           {
-            "nuance": "LDIV",
+            "nuance": "LUDI",
             "tete": "Philippe CHARRIN",
-            "pct": 100
+            "pct": 100,
+            "elu": true
           }
         ],
         "t2": null
