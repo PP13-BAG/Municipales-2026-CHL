@@ -6377,7 +6377,7 @@
     },
     "2026": {
       "13001": {
-        "nuance": null,
+        "nuance": "LDVD",
         "t1": [
           {
             "nuance": "LDVD",
@@ -6414,22 +6414,23 @@
           {
             "nuance": "LDVD",
             "tete": "Sophie JOISSAINS",
-            "pct": 0
+            "pct": 47.35,
+            "elu": true
           },
           {
             "nuance": "LUG",
             "tete": "Marc PENA",
-            "pct": 0
+            "pct": 31.03
           },
           {
             "nuance": "LEXD",
             "tete": "Jean-Louis GEIGER",
-            "pct": 0
+            "pct": 13.66
           },
           {
             "nuance": "LHOR",
             "tete": "Philippe KLEIN",
-            "pct": 0
+            "pct": 7.87
           }
         ]
       },
