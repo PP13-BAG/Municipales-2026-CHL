@@ -7239,7 +7239,7 @@
         "t2": null
       },
       "13037": {
-        "nuance": null,
+        "nuance": "LDVG",
         "t1": [
           {
             "nuance": "LDVG",
@@ -7271,22 +7271,23 @@
           {
             "nuance": "LDVG",
             "tete": "Jérôme MARCILIAC",
-            "pct": 0
+            "pct": 43.23,
+            "elu": true
           },
           {
             "nuance": "LDVG",
             "tete": "Joël YERPEZ",
-            "pct": 0
+            "pct": 26.72
           },
           {
             "nuance": "LRN",
             "tete": "Stéphane NOËL",
-            "pct": 0
+            "pct": 19.84
           },
           {
             "nuance": "LDVD",
             "tete": "Richard CAMPANELLI",
-            "pct": 0
+            "pct": 10.22
           },
           {
             "nuance": "LDVD",
