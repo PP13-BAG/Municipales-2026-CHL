@@ -10199,7 +10199,7 @@
     },
     "LSOC": {
       "label": "Parti Socialiste",
-      "color": "#a01060",
+      "color": "#ff80c0",
       "g": "g"
     },
     "LVEC": {
@@ -10209,12 +10209,12 @@
     },
     "LUG": {
       "label": "Union de la gauche",
-      "color": "#a01060",
+      "color": "#ff80c0",
       "g": "g"
     },
     "LDVG": {
       "label": "Divers gauche",
-      "color": "#a01060",
+      "color": "#ff80c0",
       "g": "g"
     },
     "LECO": {
@@ -10264,17 +10264,17 @@
     },
     "LLR": {
       "label": "Les Républicains",
-      "color": "#0d3a8e",
+      "color": "#3470fa",
       "g": "dr"
     },
     "LUD": {
       "label": "Union de la droite",
-      "color": "#0d3a8e",
+      "color": "#3470fa",
       "g": "dr"
     },
     "LDVD": {
       "label": "Divers droite",
-      "color": "#0d3a8e",
+      "color": "#3470fa",
       "g": "dr"
     },
     "LDSV": {
