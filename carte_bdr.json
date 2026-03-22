@@ -8685,7 +8685,7 @@
         ]
       },
       "13096": {
-        "nuance": "LLR",
+        "nuance": null,
         "t1": [
           {
             "nuance": "LLR",
@@ -8712,8 +8712,7 @@
           {
             "nuance": "LLR",
             "tete": "Didier HONORE",
-            "pct": 100,
-            "elu": true
+            "pct": 0
           },
           {
             "nuance": "LDIV",
