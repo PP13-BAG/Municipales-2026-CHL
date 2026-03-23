@@ -8682,12 +8682,13 @@
         ]
       },
       "13096": {
-        "nuance": "LDIV",
+        "nuance": "LLR",
         "t1": [
           {
             "nuance": "LLR",
             "tete": "Didier HONORE",
-            "pct": 34.77
+            "pct": 34.77,
+            "elu": true
           },
           {
             "nuance": "LDIV",
@@ -8705,24 +8706,7 @@
             "pct": 5.49
           }
         ],
-        "t2": [
-          {
-            "nuance": "LDIV",
-            "tete": "Thibaut MENA",
-            "pct": 43.4,
-            "elu": true
-          },
-          {
-            "nuance": "LLR",
-            "tete": "Didier HONORE",
-            "pct": 37.18
-          },
-          {
-            "nuance": "LDIV",
-            "tete": "Christelle AILLET",
-            "pct": 19.41
-          }
-        ]
+        "t2": null
       },
       "13097": {
         "nuance": "LDVC",
@@ -10271,7 +10255,7 @@
     "LFI": {
       "label": "La France Insoumise",
       "color": "#b5002b",
-      "g": "exg"
+      "g": "g"
     },
     "LCOM": {
       "label": "Parti Communiste Français",
@@ -10366,7 +10350,7 @@
     "LUDR": {
       "label": "Union des droites pour la République",
       "color": "#08194a",
-      "g": "exd"
+      "g": "dr"
     },
     "LRN": {
       "label": "Rassemblement National",
@@ -10394,7 +10378,7 @@
       2020,
       2026
     ],
-    "viewMode": "marseille",
-    "isDark": true
+    "viewMode": "dept",
+    "isDark": false
   }
 }
