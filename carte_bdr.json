@@ -7748,7 +7748,7 @@
         "t2": null
       },
       "13055": {
-        "nuance": null,
+        "nuance": "LUG",
         "t1": [
           {
             "nuance": "LUG",
@@ -7788,19 +7788,20 @@
         ],
         "t2": [
           {
-            "nuance": "LDVD",
-            "tete": "Martine VASSAL",
-            "pct": 0
-          },
-          {
             "nuance": "LUG",
             "tete": "Benoît PAYAN",
-            "pct": 0
+            "pct": 54.34,
+            "elu": true
           },
           {
             "nuance": "LRN",
             "tete": "Franck ALLISIO",
-            "pct": 0
+            "pct": 40.3
+          },
+          {
+            "nuance": "LDVD",
+            "tete": "Martine VASSAL",
+            "pct": 5.36
           },
           {
             "nuance": "LFI",
