@@ -8683,13 +8683,12 @@
         ]
       },
       "13096": {
-        "nuance": "LLR",
+        "nuance": "LDIV",
         "t1": [
           {
             "nuance": "LLR",
             "tete": "Didier HONORE",
-            "pct": 34.77,
-            "elu": true
+            "pct": 34.77
           },
           {
             "nuance": "LDIV",
@@ -8707,7 +8706,24 @@
             "pct": 5.49
           }
         ],
-        "t2": null
+        "t2": [
+          {
+            "nuance": "LDIV",
+            "tete": "Thibaut MENA",
+            "pct": 43.4,
+            "elu": true
+          },
+          {
+            "nuance": "LLR",
+            "tete": "Didier HONORE",
+            "pct": 37.18
+          },
+          {
+            "nuance": "LDIV",
+            "tete": "Christelle AILLET",
+            "pct": 19.41
+          }
+        ]
       },
       "13097": {
         "nuance": "LDVC",
